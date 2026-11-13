@@ -46,8 +46,8 @@
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #0F172A;
-      color: #F8FAFC;
+      background-color: #F3F5F9;
+      color: #0F172A;
     }
 
     .font-carlito {
@@ -161,10 +161,292 @@
     .row-even { background-color: #F2F4F8; }
     .row-odd { background-color: #FAFAFA; }
 
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0F172A; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    /* ======================================================================
+       INTERFACE DO APP (tema claro institucional, responsivo)
+       Os documentos (certificado/histórico) não usam estas classes.
+       ====================================================================== */
+    :root {
+      --ui-bg: #F3F5F9;
+      --ui-canvas: #E6EAF0;
+      --ui-surface: #FFFFFF;
+      --ui-line: #E2E8F0;
+      --ui-line-strong: #CBD5E1;
+      --ui-text: #0F172A;
+      --ui-muted: #64748B;
+      --ui-soft: #F1F5F9;
+      --ui-header-h: 60px;
+      --ui-nav-h: 64px;
+    }
+    html, body { height: 100%; }
+    body.ui-body {
+      height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .ui-btn.hidden, .ui-icon-btn.hidden, .ui-menu-item.hidden, .ui-menu-sep.hidden,
+    .ui-nav-item.hidden, .ui-modal.hidden, .ui-toast.hidden, .ui-menu.hidden { display: none; }
+
+    /* Cabeçalho */
+    .ui-header {
+      height: var(--ui-header-h); flex-shrink: 0; z-index: 30;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 0 12px; background: var(--ui-surface); border-bottom: 1px solid var(--ui-line);
+    }
+    .ui-logo-mark { width: 38px; height: 38px; border-radius: 9999px; flex-shrink: 0; object-fit: contain; }
+    .ui-logo-mark:not([src]) { display: none; }
+    .ui-app-title { font-weight: 700; font-size: 15px; color: var(--cto-navy); letter-spacing: -0.01em; line-height: 1.2; }
+    .ui-app-subtitle { font-size: 12px; color: var(--ui-muted); line-height: 1.3; }
+    .ui-title-short { display: none; }
+
+    .ui-status {
+      display: inline-flex; align-items: center; gap: 8px; height: 36px; max-width: 280px;
+      padding: 0 12px; border-radius: 9999px; border: 1px solid var(--ui-line);
+      background: var(--ui-soft); color: #334155; font-size: 12px; font-weight: 500; cursor: pointer;
+    }
+    .ui-status:hover { border-color: var(--ui-line-strong); }
+    body.is-readonly .ui-status { cursor: default; }
+    .ui-status-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Botões */
+    .ui-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      height: 36px; padding: 0 14px; border-radius: 10px; white-space: nowrap;
+      border: 1px solid var(--ui-line-strong); background: var(--ui-surface); color: #1E293B;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s, border-color .15s;
+    }
+    .ui-btn:hover { background: var(--ui-soft); }
+    .ui-btn-primary { background: var(--cto-navy); border-color: var(--cto-navy); color: #fff; }
+    .ui-btn-primary:hover { background: #003A75; }
+    .ui-btn-success { background: #047857; border-color: #047857; color: #fff; }
+    .ui-btn-success:hover { background: #065F46; }
+    .ui-btn-sm { height: 30px; padding: 0 10px; font-size: 12px; border-radius: 8px; }
+    .ui-count {
+      min-width: 20px; height: 20px; padding: 0 6px; border-radius: 9999px; font-size: 11px; line-height: 20px;
+      background: var(--ui-soft); color: #334155; text-align: center; border: 1px solid var(--ui-line);
+    }
+    .ui-icon-btn {
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 36px; height: 36px; border-radius: 10px; border: 1px solid transparent;
+      background: transparent; color: #334155; cursor: pointer; transition: background .15s;
+    }
+    .ui-icon-btn:hover { background: var(--ui-soft); border-color: var(--ui-line); }
+    .ui-icon-btn-sm { width: 30px; height: 30px; border-radius: 8px; font-size: 12px; color: var(--ui-muted); }
+    .ui-link { font-size: 12px; font-weight: 600; color: var(--cto-navy); cursor: pointer; background: none; border: 0; padding: 0; }
+    .ui-link:hover { text-decoration: underline; }
+    .ui-link-danger { color: var(--cto-red); }
+
+    /* Menu "Mais ações" */
+    .ui-menu {
+      position: absolute; right: 0; top: calc(100% + 6px); z-index: 60; width: 270px;
+      background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: 14px;
+      box-shadow: 0 18px 40px -12px rgba(15, 23, 42, .25); padding: 6px;
+    }
+    .ui-menu-item {
+      display: flex; width: 100%; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px;
+      font-size: 14px; font-weight: 500; color: #1E293B; text-align: left; cursor: pointer; background: none; border: 0;
+    }
+    .ui-menu-item:hover { background: var(--ui-soft); }
+    .ui-menu-item svg { color: var(--ui-muted); }
+    .ui-menu-danger, .ui-menu-danger svg { color: var(--cto-red) !important; }
+    .ui-menu-sep { height: 1px; background: var(--ui-line); margin: 6px 4px; }
+    .ui-menu-label { padding: 6px 12px 2px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #94A3B8; }
+
+    /* Estrutura */
+    .ui-main { flex: 1 1 auto; min-height: 0; display: flex; overflow: hidden; }
+    .ui-sidebar {
+      width: 360px; flex-shrink: 0; min-height: 0; display: flex; flex-direction: column;
+      background: var(--ui-surface); border-right: 1px solid var(--ui-line); z-index: 20;
+    }
+    .ui-side-tabs.ui-seg { display: none; margin: 12px 14px 0; }
+    .ui-pane { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+    .ui-pane-scroll { overflow-y: auto; }
+    .ui-pane-section { padding: 14px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--ui-line); }
+    #paneConfig .ui-pane-section { border-bottom: 0; }
+    body[data-view="config"] #paneAlunos { display: none; }
+    body:not([data-view="config"]) #paneConfig { display: none; }
+
+    .ui-section-title { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--ui-muted); }
+    .ui-label { font-size: 12px; font-weight: 600; color: #475569; }
+    .ui-help { font-size: 12px; color: var(--ui-muted); line-height: 1.5; }
+    .ui-help code { color: var(--cto-red); font-size: 11px; }
+    .ui-field { display: flex; flex-direction: column; gap: 4px; }
+    .ui-chip {
+      display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 9999px;
+      background: #EAF0F8; color: var(--cto-navy); font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .ui-card { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: 12px; padding: 12px; }
+
+    /* Campos */
+    .ui-input {
+      width: 100%; height: 38px; padding: 0 12px; border-radius: 10px;
+      border: 1px solid var(--ui-line-strong); background: var(--ui-surface); color: var(--ui-text);
+      font-size: 13px; outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    select.ui-input { padding-right: 28px; cursor: pointer; }
+    .ui-input:focus { border-color: var(--cto-navy); box-shadow: 0 0 0 3px rgba(0, 40, 85, .12); }
+    .ui-input::placeholder { color: #94A3B8; }
+    .ui-input-search { padding-left: 36px; padding-right: 36px; }
+    .ui-input-search::-webkit-search-cancel-button { display: none; }
+    .ui-textarea { height: auto; padding: 10px 12px; line-height: 1.55; resize: vertical; }
+    .ui-check { width: 16px; height: 16px; accent-color: var(--cto-navy); cursor: pointer; flex-shrink: 0; }
+
+    /* Interruptor (checkbox estilizado) */
+    .ui-switch-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      font-size: 13px; color: #334155; cursor: pointer;
+    }
+    .ui-switch {
+      appearance: none; -webkit-appearance: none; flex-shrink: 0; cursor: pointer;
+      width: 38px; height: 22px; border-radius: 9999px; background: var(--ui-line-strong);
+      position: relative; transition: background .15s;
+    }
+    .ui-switch::after {
+      content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 9999px;
+      background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s;
+    }
+    .ui-switch:checked { background: var(--cto-navy); }
+    .ui-switch:checked::after { transform: translateX(16px); }
+
+    /* Controle segmentado */
+    .ui-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: #EDF1F6; border-radius: 12px; }
+    .ui-seg-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 34px; padding: 0 10px;
+      border-radius: 9px; border: 0; background: transparent; color: var(--ui-muted);
+      font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background .15s, color .15s;
+    }
+    .ui-seg-btn:hover { color: var(--ui-text); }
+    .ui-seg-btn.is-active { background: var(--ui-surface); color: var(--cto-navy); box-shadow: 0 1px 3px rgba(15, 23, 42, .12); }
+    .ui-seg-sm .ui-seg-btn { height: 28px; font-size: 12px; padding: 0 10px; }
+    #certLayoutSelectorBox.hidden { display: none; }
+
+    /* Lista de alunos */
+    .ui-student-list { flex: 1 1 auto; min-height: 120px; overflow-y: auto; }
+    .stu-item {
+      width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 11px 14px; text-align: left; border-bottom: 1px solid #EEF2F6; cursor: pointer;
+      background: var(--ui-surface); transition: background .12s;
+    }
+    .stu-item:hover { background: #F8FAFC; }
+    .stu-item.is-active { background: #FBEEF0; box-shadow: inset 3px 0 0 var(--cto-red); }
+    .stu-name { font-size: 14px; font-weight: 600; color: var(--ui-text); }
+    .stu-item.is-active .stu-name { color: var(--cto-red); }
+    .stu-meta { font-size: 12px; color: var(--ui-muted); }
+    .stu-badge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+    .stu-sent { font-size: 11px; font-weight: 700; color: #047857; }
+    .ui-empty { padding: 28px 16px; text-align: center; font-size: 13px; color: var(--ui-muted); }
+
+    /* Pré-visualização */
+    .ui-preview { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; background: var(--ui-canvas); position: relative; overflow: hidden; }
+    .ui-toolbar {
+      height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 0 10px; background: var(--ui-surface); border-bottom: 1px solid var(--ui-line);
+    }
+    .ui-toolbar-index { font-size: 12px; font-weight: 600; color: #334155; min-width: 64px; text-align: center; white-space: nowrap; }
+    .ui-toolbar-summary { font-size: 13px; font-weight: 500; color: #334155; margin-left: 6px; }
+    .ui-toolbar-zoom { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ui-muted); width: 40px; text-align: center; }
+    .ui-workspace { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 24px; -webkit-overflow-scrolling: touch; }
+    #previewSizer { margin: 0 auto; position: relative; overflow: hidden; }
+    #previewScaleContainer { width: max-content; transform-origin: top left; }
+    .ui-preview-empty {
+      background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: 16px; padding: 40px 28px;
+      text-align: center; max-width: 420px; margin: 48px auto; box-shadow: 0 10px 30px -18px rgba(15,23,42,.35);
+    }
+
+    /* Navegação inferior (celular) */
+    .ui-bottom-nav { display: none; }
+    .ui-nav-item {
+      flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+      font-size: 11px; font-weight: 600; color: var(--ui-muted); background: none; border: 0; cursor: pointer;
+    }
+    .ui-nav-item.is-active { color: var(--cto-navy); }
+    .ui-nav-item.is-active svg { color: var(--cto-red); }
+
+    /* Janelas (modais) */
+    .ui-modal {
+      position: fixed; inset: 0; z-index: 50; background: rgba(15, 23, 42, .45);
+      -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .ui-modal-panel {
+      width: 100%; max-width: 560px; max-height: 92vh; max-height: 92dvh; overflow-y: auto;
+      background: var(--ui-surface); color: var(--ui-text); border-radius: 18px; padding: 22px;
+      box-shadow: 0 30px 60px -20px rgba(15, 23, 42, .45); gap: 14px;
+    }
+    .ui-modal-lg { max-width: 720px; overflow: hidden; }
+    .ui-modal-sm { max-width: 420px; }
+    .ui-modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+    .ui-modal-title { font-size: 17px; font-weight: 700; color: var(--cto-navy); }
+    .ui-modal-foot { padding-top: 12px; border-top: 1px solid var(--ui-line); flex-shrink: 0; }
+    .ui-send-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ui-send-actions #btnLaunchOutlookWeb { margin-left: auto; }
+    .ui-details { border: 1px solid var(--ui-line); border-radius: 12px; padding: 10px 12px; }
+    .ui-details summary { font-size: 13px; font-weight: 600; color: #334155; cursor: pointer; }
+    .ui-alert { font-size: 13px; padding: 10px 12px; border-radius: 10px; border: 1px solid; line-height: 1.5; }
+    .ui-alert-error { background: #FEF2F2; border-color: #FECACA; color: #991B1B; }
+    .ui-alert-warn { background: #FFFBEB; border-color: #FDE68A; color: #92400E; }
+    .ui-alert-ok { background: #ECFDF5; border-color: #A7F3D0; color: #065F46; }
+    .ui-pill { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; }
+    .ui-pill-ok { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+    .ui-pill-wait { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+
+    /* Aviso flutuante */
+    .ui-toast {
+      position: fixed; z-index: 70; right: 20px; bottom: 20px; max-width: min(420px, calc(100vw - 32px));
+      padding: 12px 16px; border-radius: 12px; background: #0F172A; color: #fff; font-size: 13px; font-weight: 500;
+      box-shadow: 0 18px 40px -12px rgba(15, 23, 42, .5);
+    }
+
+    /* Computador grande: mostra as abas do painel lateral (só administrador) */
+    @media (min-width: 1024px) {
+      body:not(.is-readonly) .ui-side-tabs.ui-seg { display: grid; }
+    }
+
+    /* Tablet e celular */
+    @media (max-width: 1023.98px) {
+      .ui-sidebar { width: 100%; border-right: 0; }
+      body[data-view="doc"] #sidebar { display: none; }
+      body:not([data-view="doc"]) #previewMain { display: none; }
+      .ui-bottom-nav {
+        display: flex; flex-shrink: 0; height: calc(var(--ui-nav-h) + env(safe-area-inset-bottom));
+        padding-bottom: env(safe-area-inset-bottom); background: var(--ui-surface);
+        border-top: 1px solid var(--ui-line); z-index: 30;
+      }
+      .ui-workspace { padding: 12px; }
+      .ui-toast { left: 16px; right: 16px; bottom: calc(var(--ui-nav-h) + 12px + env(safe-area-inset-bottom)); max-width: none; }
+    }
+
+    /* Celular */
+    @media (max-width: 639.98px) {
+      .ui-header { padding: 0 8px 0 10px; gap: 8px; }
+      .ui-title-long, .ui-app-subtitle, .ui-hide-sm { display: none !important; }
+      .ui-title-short { display: inline; }
+      .ui-logo-mark { width: 34px; height: 34px; }
+      .ui-status { padding: 0; width: 36px; justify-content: center; }
+      .ui-status-text { display: none; }
+      .ui-btn { padding: 0 10px; }
+      #btnOpenEmailModal { padding: 0 8px; }
+      .ui-input { font-size: 16px; height: 42px; } /* evita zoom automático do iPhone */
+      .ui-seg-btn { height: 38px; }
+      .ui-toolbar { padding: 0 4px; gap: 2px; }
+      .ui-toolbar-index { display: none; }
+      .ui-toolbar-summary { margin-left: 2px; font-size: 13px; flex: 1 1 auto; min-width: 0; text-align: center; }
+      .ui-modal { align-items: flex-end; padding: 0; }
+      .ui-modal.ui-modal-center { align-items: center; padding: 16px; }
+      .ui-modal-panel { max-width: none; border-radius: 18px 18px 0 0; padding: 18px 16px calc(16px + env(safe-area-inset-bottom)); max-height: 94dvh; }
+      .ui-modal-center .ui-modal-panel { border-radius: 18px; }
+      .ui-modal-lg { overflow-y: auto; }
+      .ui-modal-lg > .flex-1 { flex: none; overflow: visible; }
+      .ui-modal-lg .ui-modal-foot > p { display: none; }
+      .ui-send-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      .ui-send-actions #btnLaunchOutlookWeb, .ui-send-actions #btnSendMarkNext { grid-column: span 2; margin-left: 0; height: 44px; }
+      .ui-menu { position: fixed; left: 8px; right: 8px; top: calc(var(--ui-header-h) + 4px); width: auto; }
+      .ui-menu-item { padding: 13px 12px; }
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
 
     /* Regras de Impressão / Exportação PDF */
     @media print {
@@ -187,7 +469,11 @@
         display: block !important;
         height: auto !important;
       }
+      body.ui-body { height: auto !important; display: block !important; overflow: visible !important; }
+      #previewMain { display: block !important; overflow: visible !important; background: #FFFFFF !important; }
+      #previewSizer { width: auto !important; height: auto !important; overflow: visible !important; margin: 0 !important; }
       #previewScaleContainer {
+        width: auto !important;
         transform: none !important;
         margin: 0 !important;
         padding: 0 !important;
@@ -206,7 +492,7 @@
     }
   </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden select-none">
+<body class="ui-body select-none" data-view="alunos">
 
   <!-- INPUTS DE ARQUIVO GLOBAIS OCULTOS PARA ACIONAMENTO DIRETO POR BOTÃO -->
   <input id="GlobalQuickFileInput" type="file" accept=".xlsx,.xls" class="hidden" />
@@ -214,511 +500,468 @@
   <input id="InputUploadSig2" type="file" accept="image/*" class="hidden" />
 
   <!-- NOTIFICAÇÃO TOAST FLUTUANTE -->
-  <div id="toastNotification" class="no-print fixed bottom-5 right-5 z-50 hidden items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-xs font-medium text-white shadow-2xl">
+  <div id="toastNotification" class="no-print ui-toast hidden items-center gap-2.5">
     <span id="toastDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
     <span id="toastMessage">Ação concluída</span>
   </div>
 
   <!-- BARRA DE TOPO -->
-  <header class="no-print h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-30">
-    <div class="flex items-center gap-3">
-      <div>
-        <span class="font-bold text-white tracking-tight text-sm uppercase">Centro de Treinamento Olímpico</span>
-        <p id="appSubtitle" class="text-[11px] text-slate-400">Gerador de Certificados de Premiação e Histórico Olímpico</p>
+  <header class="no-print ui-header">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <img id="appLogoMark" alt="" class="ui-logo-mark" />
+      <div class="min-w-0">
+        <div class="ui-app-title truncate"><span class="ui-title-long">Centro de Treinamento Olímpico</span><span class="ui-title-short">CTO</span></div>
+        <p id="appSubtitle" class="ui-app-subtitle truncate">Gerador de Certificados e Histórico Olímpico</p>
       </div>
     </div>
 
-    <!-- Status da Planilha e Ações -->
-    <div class="flex items-center gap-2">
-      <div id="syncStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-300">
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- Status da planilha (clique abre a janela da planilha) -->
+      <button id="syncStatusBadge" type="button" class="ui-status" title="Planilha carregada — clique para carregar ou atualizar">
         <span id="syncDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
-        <span id="syncText">Nenhuma planilha carregada</span>
+        <span id="syncText" class="ui-status-text">Nenhuma planilha carregada</span>
+      </button>
+
+      <button id="btnReloadOneDrive" type="button" class="admin-only ui-icon-btn" title="Atualizar dados (ler novamente a planilha)" aria-label="Atualizar dados">
+        <i data-lucide="refresh-cw" class="w-4 h-4 pointer-events-none"></i>
+      </button>
+
+      <!-- Central de E-mails: envio individual assistido -->
+      <button id="btnOpenEmailModal" type="button" class="admin-only ui-btn" title="Envio individual assistido: um aluno por vez pelo Outlook Web (colunas C, J e K)">
+        <i data-lucide="mail" class="w-4 h-4 pointer-events-none"></i>
+        <span class="ui-hide-sm pointer-events-none">E-mails</span>
+        <span class="ui-count pointer-events-none" id="emailCountLabel">0</span>
+      </button>
+
+      <!-- Imprimir / PDF do documento em exibição -->
+      <button id="btnPrintSingle" type="button" class="ui-btn ui-btn-primary" title="Baixar PDF ou imprimir o documento em exibição">
+        <i data-lucide="printer" class="w-4 h-4 pointer-events-none"></i>
+        <span class="ui-hide-sm pointer-events-none">Imprimir / PDF</span>
+      </button>
+
+      <!-- Menu com as demais ações -->
+      <div class="relative">
+        <button id="btnMoreMenu" type="button" class="ui-icon-btn" title="Mais ações" aria-label="Mais ações" aria-haspopup="true" aria-expanded="false">
+          <i data-lucide="more-vertical" class="w-4 h-4 pointer-events-none"></i>
+        </button>
+        <div id="moreMenu" class="ui-menu hidden" role="menu">
+          <button id="btnOpenDataSource" type="button" class="admin-only ui-menu-item" role="menuitem">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4 pointer-events-none"></i>
+            <span class="pointer-events-none">Carregar planilha (.xlsx)</span>
+          </button>
+          <div class="admin-only ui-menu-sep"></div>
+          <div class="ui-menu-label">Alunos filtrados</div>
+          <button id="btnPrintAllFiltered" type="button" class="ui-menu-item" role="menuitem" title="Gerar documento único com todos os alunos filtrados">
+            <i data-lucide="layers" class="w-4 h-4 pointer-events-none"></i>
+            <span class="pointer-events-none">Gerar todos em um PDF (<span id="batchCountLabel">0</span>)</span>
+          </button>
+          <button id="btnExportZip" type="button" class="ui-menu-item" role="menuitem" title="Baixar arquivo .ZIP com um PDF separado e nomeado para cada aluno filtrado">
+            <i data-lucide="folder-archive" class="w-4 h-4 pointer-events-none"></i>
+            <span class="pointer-events-none">Baixar .ZIP com PDFs (<span id="zipCountLabel">0</span>)</span>
+          </button>
+          <div class="admin-only ui-menu-sep"></div>
+          <button id="btnOpenExportPanel" type="button" class="admin-only ui-menu-item" role="menuitem" title="Gerar arquivo HTML somente leitura (sem e-mails) para professores e outros setores">
+            <i data-lucide="presentation" class="w-4 h-4 pointer-events-none"></i>
+            <span class="pointer-events-none">Exportar Painel de Consulta</span>
+          </button>
+          <button id="btnWipeBrowser" type="button" class="admin-only ui-menu-item ui-menu-danger" role="menuitem" title="Apaga deste navegador todos os dados guardados pelo Gerador (planilha memorizada, rubricas, configurações, marcações de envio e vínculo). Use em computadores que não são seus.">
+            <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
+            <span class="pointer-events-none">Limpar tudo deste navegador</span>
+          </button>
+        </div>
       </div>
-
-      <button id="btnReloadOneDrive" type="button" class="admin-only flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-medium transition cursor-pointer" title="Ler novamente a planilha (1 clique no Edge com vínculo; no Brave abre o seletor de arquivo)">
-        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 pointer-events-none"></i>
-        <span class="pointer-events-none">Atualizar Dados</span>
-      </button>
-
-      <button id="btnOpenDataSource" type="button" class="admin-only flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 text-xs font-medium transition cursor-pointer">
-        <i data-lucide="folder-sync" class="w-3.5 h-3.5 text-sky-400 pointer-events-none"></i>
-        <span class="pointer-events-none">Carregar Planilha (.xlsx)</span>
-      </button>
-
-      <button id="btnWipeBrowser" type="button" class="admin-only flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-red-950 text-slate-300 hover:text-red-200 border border-slate-700 text-xs font-medium transition cursor-pointer" title="Apaga deste navegador todos os dados guardados pelo Gerador (planilha memorizada, logo, rubricas, configurações, marcações de envio e vínculo). Use em computadores que não são seus.">
-        <i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i>
-        <span class="pointer-events-none">Limpar tudo deste navegador</span>
-      </button>
-
-      <div class="h-5 w-px bg-slate-800 mx-0.5"></div>
-
-      <!-- v9: Exportar Painel de Consulta (somente leitura, sem e-mails) para professores -->
-      <button id="btnOpenExportPanel" type="button" class="admin-only flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/40 text-xs font-semibold transition cursor-pointer" title="Gerar arquivo HTML somente leitura (sem e-mails) para professores e outros setores">
-        <i data-lucide="presentation" class="w-3.5 h-3.5 pointer-events-none"></i>
-        <span class="pointer-events-none">Exportar Painel de Consulta</span>
-      </button>
-
-      <!-- Central de E-mails: envio individual assistido (v9) -->
-      <button id="btnOpenEmailModal" type="button" class="admin-only flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs font-semibold transition cursor-pointer" title="Envio individual assistido: um aluno por vez pelo Outlook Web (Colunas C, J e K)">
-        <i data-lucide="mail" class="w-3.5 h-3.5 pointer-events-none"></i>
-        <span class="pointer-events-none">Enviar E-mails (<span id="emailCountLabel">0</span>)</span>
-      </button>
-
-      <!-- Imprimir / PDF Individual -->
-      <button id="btnPrintSingle" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#A6192E] hover:bg-[#8e1427] text-white text-xs font-semibold shadow-lg shadow-red-950/50 transition cursor-pointer" title="Baixar PDF ou imprimir o documento em exibição">
-        <i data-lucide="printer" class="w-3.5 h-3.5 pointer-events-none"></i>
-        <span class="pointer-events-none">Imprimir / Salvar PDF</span>
-      </button>
-
-      <!-- Gerar Todos os Filtrados (Impressão / PDF Único) -->
-      <button id="btnPrintAllFiltered" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#002855] hover:bg-[#003875] text-white border border-blue-800/60 text-xs font-semibold transition cursor-pointer" title="Gerar documento único com todos os alunos filtrados">
-        <i data-lucide="layers" class="w-3.5 h-3.5 pointer-events-none"></i>
-        <span class="pointer-events-none">Gerar Todos (<span id="batchCountLabel">0</span>)</span>
-      </button>
-
-      <!-- Exportar .ZIP com PDFs individuais nomeados -->
-      <button id="btnExportZip" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-500/40 text-xs font-semibold transition cursor-pointer" title="Baixar arquivo .ZIP com um PDF separado e nomeado para cada aluno filtrado">
-        <i data-lucide="folder-archive" class="w-3.5 h-3.5 pointer-events-none"></i>
-        <span class="pointer-events-none">Baixar .ZIP (<span id="zipCountLabel">0</span> PDFs)</span>
-      </button>
     </div>
   </header>
 
   <!-- CORPO PRINCIPAL -->
-  <div id="appMainWrapper" class="flex-1 flex overflow-hidden">
+  <div id="appMainWrapper" class="ui-main">
 
-    <!-- PAINEL LATERAL ESQUERDO -->
-    <aside class="no-print w-96 bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 z-20">
+    <!-- PAINEL LATERAL (no celular: telas "Alunos" e "Ajustes") -->
+    <aside id="sidebar" class="no-print ui-sidebar">
 
-      <!-- Seletor de Modo: Certificado vs Histórico -->
-      <div class="p-3.5 border-b border-slate-800">
-        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">1. Modelo de Documento</label>
-        <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800">
-          <button id="tabModeCert" type="button" class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-semibold transition bg-[#A6192E] text-white shadow cursor-pointer">
-            <i data-lucide="medal" class="w-3.5 h-3.5 pointer-events-none"></i>
-            <span class="pointer-events-none">Certificado de Premiação</span>
-          </button>
-          <button id="tabModeHist" type="button" class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer">
-            <i data-lucide="file-text" class="w-3.5 h-3.5 pointer-events-none"></i>
-            <span class="pointer-events-none">Histórico Olímpico</span>
-          </button>
-        </div>
-
-        <!-- Opção de Layout para 30+ Premiações (visível apenas no modo Certificado) -->
-        <div id="certLayoutSelectorBox" class="mt-3 pt-2.5 border-t border-slate-800/80">
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Disposição das Premiações</span>
-          </div>
-          <div class="grid grid-cols-2 gap-1.5">
-            <button id="btnLayoutGrid" type="button" class="py-1.5 px-2.5 rounded-lg text-[11px] font-medium border transition bg-slate-800 border-sky-500/60 text-sky-300 cursor-pointer">
-              Grade Adaptativa
-            </button>
-            <button id="btnLayoutGrouped" type="button" class="py-1.5 px-2.5 rounded-lg text-[11px] font-medium border transition bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 cursor-pointer">
-              Agrupado por Medalha
-            </button>
-          </div>
-        </div>
+      <!-- Abas do painel lateral (computador, somente administrador) -->
+      <div class="ui-side-tabs ui-seg">
+        <button type="button" class="ui-seg-btn" data-view-target="alunos">
+          <i data-lucide="users" class="w-4 h-4 pointer-events-none"></i><span class="pointer-events-none">Alunos</span>
+        </button>
+        <button type="button" class="ui-seg-btn" data-view-target="config">
+          <i data-lucide="sliders-horizontal" class="w-4 h-4 pointer-events-none"></i><span class="pointer-events-none">Ajustes</span>
+        </button>
       </div>
 
-      <!-- Filtros e Seleção de Aluno (Sem Filtro de Conquistas) -->
-      <div class="p-3.5 border-b border-slate-800 space-y-2.5">
-        <div class="flex items-center justify-between">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">2. Filtrar e Selecionar Aluno</label>
-          <span id="studentCounterBadge" class="text-[11px] font-medium text-sky-400">0 alunos</span>
+      <!-- ===== Painel: Alunos ===== -->
+      <div id="paneAlunos" class="ui-pane">
+        <div class="ui-pane-section">
+          <div class="ui-section-title">Documento</div>
+          <div class="ui-seg">
+            <button id="tabModeCert" type="button" class="ui-seg-btn is-active">
+              <i data-lucide="medal" class="w-4 h-4 pointer-events-none"></i>
+              <span class="pointer-events-none">Certificado</span>
+            </button>
+            <button id="tabModeHist" type="button" class="ui-seg-btn">
+              <i data-lucide="file-text" class="w-4 h-4 pointer-events-none"></i>
+              <span class="pointer-events-none">Histórico</span>
+            </button>
+          </div>
+
+          <!-- Disposição das premiações (somente Certificado) -->
+          <div id="certLayoutSelectorBox" class="flex items-center justify-between gap-3">
+            <span class="ui-label">Premiações</span>
+            <div class="ui-seg ui-seg-sm">
+              <button id="btnLayoutGrid" type="button" class="ui-seg-btn is-active">Em grade</button>
+              <button id="btnLayoutGrouped" type="button" class="ui-seg-btn">Por medalha</button>
+            </div>
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-1">Filtrar Ano</label>
-            <select id="filterYear" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 cursor-pointer">
-              <option value="Todos">Todos os Anos</option>
+        <div class="ui-pane-section">
+          <div class="flex items-center justify-between">
+            <div class="ui-section-title">Alunos</div>
+            <span id="studentCounterBadge" class="ui-chip">0 alunos</span>
+          </div>
+
+          <!-- Caixa de Pesquisa -->
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input id="searchStudentInput" type="search" placeholder="Buscar por nome ou e-mail" data-ro-placeholder="Buscar por nome" class="ui-input ui-input-search" />
+            <button id="btnClearSearch" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer" aria-label="Limpar busca">
+              <i data-lucide="x" class="w-4 h-4 pointer-events-none"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <select id="filterYear" class="ui-input" aria-label="Filtrar por ano">
+              <option value="Todos">Todos os anos</option>
+            </select>
+            <select id="filterOlympiad" class="ui-input" aria-label="Filtrar por olimpíada">
+              <option value="Todas">Todas as olimpíadas</option>
             </select>
           </div>
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-1">Filtrar Olimpíada</label>
-            <select id="filterOlympiad" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 cursor-pointer">
-              <option value="Todas">Todas as Olimpíadas</option>
-            </select>
-          </div>
-        </div>
 
-        <!-- Modo de Visualização: Individual vs Todos os Filtrados -->
-        <label class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
-          <div class="flex items-center gap-2">
-            <i data-lucide="users" class="w-3.5 h-3.5 text-sky-400 pointer-events-none"></i>
-            <span class="text-[11px] font-medium text-slate-200">Pré-visualizar todos os filtrados</span>
-          </div>
-          <input id="togglePreviewAll" type="checkbox" class="rounded bg-slate-900 border-slate-700 text-sky-500 focus:ring-0 cursor-pointer" />
-        </label>
-
-        <!-- Caixa de Pesquisa -->
-        <div class="relative">
-          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5 pointer-events-none"></i>
-          <input id="searchStudentInput" type="text" placeholder="Pesquisar aluno por nome ou e-mail..." data-ro-placeholder="Pesquisar aluno por nome..." class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500" />
-          <button id="btnClearSearch" type="button" class="hidden absolute right-2.5 top-2 text-slate-500 hover:text-slate-300 cursor-pointer">
-            <i data-lucide="x" class="w-3.5 h-3.5 pointer-events-none"></i>
-          </button>
+          <!-- Modo de Visualização: Individual vs Todos os Filtrados -->
+          <label class="ui-switch-row">
+            <span>Mostrar todos os filtrados de uma vez</span>
+            <input id="togglePreviewAll" type="checkbox" class="ui-switch" />
+          </label>
         </div>
 
         <!-- Lista de Alunos -->
-        <div id="studentListContainer" class="max-h-44 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 divide-y divide-slate-800/60">
-        </div>
+        <div id="studentListContainer" class="ui-student-list"></div>
       </div>
 
-      <!-- Personalização Institucional, Marca d'Água e Assinaturas -->
-      <div id="identityPanel" class="admin-only flex-1 overflow-y-auto p-3.5 space-y-3">
-        <div class="flex items-center justify-between">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">3. Identidade Visual e Assinaturas</label>
-          <button id="btnResetSettings" type="button" class="text-[10px] text-slate-400 hover:text-white underline cursor-pointer">Restaurar padrão</button>
-        </div>
-
-        <!-- Cabeçalho, Logotipo e Marca d'Água -->
-        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5">
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5">Instituição / Cabeçalho</label>
-            <input id="cfgSchoolName" type="text" value="CENTRO DE TREINAMENTO OLÍMPICO" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white" />
-          </div>
-
-          <!-- Controle de Marca d'Água Institucional -->
-          <div class="pt-1.5 border-t border-slate-800/80 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <label class="flex items-center gap-1.5 text-[11px] text-slate-200 font-medium cursor-pointer">
-                <input id="cfgWatermarkEnabled" type="checkbox" checked class="rounded bg-slate-900 border-slate-700 text-sky-500 focus:ring-0 cursor-pointer" />
-                <span>Marca d'Água (logo do Mackenzie) no Fundo</span>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5">Subtítulo Institucional</label>
-            <input id="cfgSubtitle" type="text" value="EXCELÊNCIA ACADÊMICA E OLÍMPIADAS DO CONHECIMENTO" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white" />
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5">Local e Data de Emissão</label>
-            <input id="cfgLocationDate" type="text" value="" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white" />
-          </div>
-        </div>
-
-        <!-- Assinaturas -->
-        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5">
-          <span class="text-xs font-semibold text-slate-200 block">Assinaturas do Rodapé</span>
-
-          <!-- Assinatura 1 -->
-          <div class="space-y-1.5 pt-1 border-t border-slate-800/80">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] text-slate-400 font-medium">1ª Assinatura (Esquerda)</span>
-              <div class="flex items-center gap-1">
-                <button id="btnTriggerSig1Upload" type="button" class="cursor-pointer text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400">
-                  Anexar Rubrica
-                </button>
-                <button id="btnClearSig1" type="button" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-900 text-slate-500 hover:text-red-300 cursor-pointer">✕</button>
-              </div>
-            </div>
-            <input id="cfgSig1Name" type="text" value="Coordenação do CTO" placeholder="Nome ou Responsável" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white" />
-            <input id="cfgSig1Role" type="text" value="Centro de Treinamento Olímpico" placeholder="Cargo / Setor" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300" />
-          </div>
-
-          <!-- Assinatura 2 -->
-          <div class="space-y-1.5 pt-2 border-t border-slate-800/80">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] text-slate-400 font-medium">2ª Assinatura (Direita)</span>
-              <div class="flex items-center gap-1">
-                <button id="btnTriggerSig2Upload" type="button" class="cursor-pointer text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400">
-                  Anexar Rubrica
-                </button>
-                <button id="btnClearSig2" type="button" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-900 text-slate-500 hover:text-red-300 cursor-pointer">✕</button>
-              </div>
-            </div>
-            <input id="cfgSig2Name" type="text" value="Direção Pedagógica" placeholder="Nome ou Responsável" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white" />
-            <input id="cfgSig2Role" type="text" value="Direção Escolar" placeholder="Cargo / Setor" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300" />
-          </div>
-        </div>
-
-        <!-- Texto Personalizado Opcional -->
-        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+      <!-- ===== Painel: Ajustes (textos e assinaturas) ===== -->
+      <div id="paneConfig" class="ui-pane ui-pane-scroll">
+        <div id="identityPanel" class="admin-only ui-pane-section">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-200">Texto do Certificado</span>
-            <label class="flex items-center gap-1.5 text-[11px] text-slate-400 cursor-pointer">
-              <input id="cfgUseCustomText" type="checkbox" class="rounded bg-slate-900 border-slate-700 text-red-600 focus:ring-0 cursor-pointer" />
-              <span>Editar manualmente</span>
-            </label>
+            <div class="ui-section-title">Textos do documento</div>
+            <button id="btnResetSettings" type="button" class="ui-link">Restaurar padrão</button>
           </div>
-          <p class="text-[11px] text-slate-400 leading-relaxed">
-            Por padrão, o texto se adapta automaticamente entre 1 conquista (singular) ou múltiplas conquistas (plural).
-          </p>
-          <textarea id="cfgCustomText" rows="3" placeholder="Use {ALUNO} e {ANO} para substituição automática..." class="hidden w-full bg-slate-900 border border-slate-800 rounded p-2 text-xs text-white"></textarea>
+
+          <div class="ui-field">
+            <label class="ui-label" for="cfgSchoolName">Instituição / cabeçalho</label>
+            <input id="cfgSchoolName" type="text" value="CENTRO DE TREINAMENTO OLÍMPICO" class="ui-input" />
+          </div>
+          <div class="ui-field">
+            <label class="ui-label" for="cfgSubtitle">Subtítulo institucional</label>
+            <input id="cfgSubtitle" type="text" value="EXCELÊNCIA ACADÊMICA E OLÍMPIADAS DO CONHECIMENTO" class="ui-input" />
+          </div>
+          <div class="ui-field">
+            <label class="ui-label" for="cfgLocationDate">Local e data de emissão</label>
+            <input id="cfgLocationDate" type="text" value="" class="ui-input" />
+          </div>
+
+          <div class="ui-section-title pt-2">Assinaturas do rodapé</div>
+
+          <div class="ui-card space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="ui-label">1ª assinatura (esquerda)</span>
+              <div class="flex items-center gap-1">
+                <button id="btnTriggerSig1Upload" type="button" class="ui-btn ui-btn-sm">Anexar rubrica</button>
+                <button id="btnClearSig1" type="button" class="ui-icon-btn ui-icon-btn-sm" title="Remover rubrica" aria-label="Remover rubrica">✕</button>
+              </div>
+            </div>
+            <input id="cfgSig1Name" type="text" value="Coordenação do CTO" placeholder="Nome ou responsável" class="ui-input" />
+            <input id="cfgSig1Role" type="text" value="Centro de Treinamento Olímpico" placeholder="Cargo / setor" class="ui-input" />
+          </div>
+
+          <div class="ui-card space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="ui-label">2ª assinatura (direita)</span>
+              <div class="flex items-center gap-1">
+                <button id="btnTriggerSig2Upload" type="button" class="ui-btn ui-btn-sm">Anexar rubrica</button>
+                <button id="btnClearSig2" type="button" class="ui-icon-btn ui-icon-btn-sm" title="Remover rubrica" aria-label="Remover rubrica">✕</button>
+              </div>
+            </div>
+            <input id="cfgSig2Name" type="text" value="Direção Pedagógica" placeholder="Nome ou responsável" class="ui-input" />
+            <input id="cfgSig2Role" type="text" value="Direção Escolar" placeholder="Cargo / setor" class="ui-input" />
+          </div>
+
+          <div class="ui-section-title pt-2">Texto do certificado</div>
+          <label class="ui-switch-row">
+            <span>Editar o texto manualmente</span>
+            <input id="cfgUseCustomText" type="checkbox" class="ui-switch" />
+          </label>
+          <p class="ui-help">Por padrão, o texto se adapta sozinho a 1 conquista (singular) ou a várias (plural).</p>
+          <textarea id="cfgCustomText" rows="4" placeholder="Use {ALUNO} e {ANO} para substituição automática..." class="hidden ui-input ui-textarea"></textarea>
         </div>
       </div>
     </aside>
 
     <!-- ÁREA CENTRAL DE PRÉ-VISUALIZAÇÃO -->
-    <main class="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
+    <main id="previewMain" class="ui-preview">
 
       <!-- Barra de Ferramentas da Pré-visualização -->
-      <div class="no-print h-11 bg-slate-900/70 border-b border-slate-800/80 px-5 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2">
-          <button id="btnPrevStudent" type="button" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition cursor-pointer" title="Aluno Anterior">
+      <div class="no-print ui-toolbar">
+        <div class="flex items-center gap-1 min-w-0 flex-1">
+          <button id="btnPrevStudent" type="button" class="ui-icon-btn" title="Aluno anterior" aria-label="Aluno anterior">
             <i data-lucide="chevron-left" class="w-4 h-4 pointer-events-none"></i>
           </button>
-          <span id="currentStudentIndexLabel" class="text-xs font-medium text-slate-300 min-w-[90px] text-center">1 de 1</span>
-          <button id="btnNextStudent" type="button" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition cursor-pointer" title="Próximo Aluno">
+          <span id="currentStudentIndexLabel" class="ui-toolbar-index">1 de 1</span>
+          <button id="btnNextStudent" type="button" class="ui-icon-btn" title="Próximo aluno" aria-label="Próximo aluno">
             <i data-lucide="chevron-right" class="w-4 h-4 pointer-events-none"></i>
           </button>
-          <div class="h-4 w-px bg-slate-800 mx-1"></div>
-          <span id="activeStudentSummary" class="text-xs text-slate-300 font-medium truncate max-w-md"></span>
+          <span id="activeStudentSummary" class="ui-toolbar-summary truncate"></span>
         </div>
 
-        <div class="flex items-center gap-2">
-          <span id="pageCountIndicator" class="text-[11px] text-sky-400 font-medium px-2.5 py-0.5 rounded bg-sky-950/60 border border-sky-800/50">1 página</span>
-          <div class="h-4 w-px bg-slate-800 mx-1"></div>
-          <button id="btnZoomOut" type="button" class="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer" title="Diminuir Zoom">
-            <i data-lucide="zoom-out" class="w-3.5 h-3.5 pointer-events-none"></i>
+        <div class="flex items-center gap-1 shrink-0">
+          <span id="pageCountIndicator" class="ui-chip ui-hide-sm">1 página</span>
+          <button id="btnZoomOut" type="button" class="ui-icon-btn" title="Diminuir zoom" aria-label="Diminuir zoom">
+            <i data-lucide="zoom-out" class="w-4 h-4 pointer-events-none"></i>
           </button>
-          <span id="zoomValueLabel" class="text-xs font-mono text-slate-300 w-12 text-center">75%</span>
-          <button id="btnZoomIn" type="button" class="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer" title="Aumentar Zoom">
-            <i data-lucide="zoom-in" class="w-3.5 h-3.5 pointer-events-none"></i>
+          <span id="zoomValueLabel" class="ui-toolbar-zoom">75%</span>
+          <button id="btnZoomIn" type="button" class="ui-icon-btn" title="Aumentar zoom" aria-label="Aumentar zoom">
+            <i data-lucide="zoom-in" class="w-4 h-4 pointer-events-none"></i>
           </button>
-          <button id="btnZoomFit" type="button" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 ml-1 cursor-pointer">
-            Ajustar à Tela
+          <button id="btnZoomFit" type="button" class="ui-icon-btn" title="Ajustar à tela" aria-label="Ajustar à tela">
+            <i data-lucide="maximize" class="w-4 h-4 pointer-events-none"></i>
           </button>
         </div>
       </div>
 
       <!-- Contêiner Rolável das Páginas -->
-      <div id="workspaceWrapper" class="flex-1 overflow-auto p-6 flex justify-center items-start">
-        <div id="previewScaleContainer" class="flex flex-col items-center gap-8 transition-transform duration-150">
-          <!-- Páginas renderizadas via JavaScript -->
+      <div id="workspaceWrapper" class="ui-workspace">
+        <div id="previewSizer">
+          <div id="previewScaleContainer" class="flex flex-col items-center gap-8">
+            <!-- Páginas renderizadas via JavaScript -->
+          </div>
         </div>
       </div>
 
     </main>
   </div>
 
-  <!-- v9: MODAL DE ENVIO INDIVIDUAL ASSISTIDO (SEM ANEXO) — UM ALUNO POR VEZ VIA OUTLOOK WEB -->
-  <div id="emailComposerModal" class="no-print fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-            <i data-lucide="mail" class="w-5 h-5 pointer-events-none"></i>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-white">Envio Individual de E-mails</h3>
-            <p class="text-xs text-slate-400">Um aluno por vez: abra no Outlook Web, envie, volte aqui e avance. E-mails das colunas <code class="text-amber-300">C</code>, <code class="text-amber-300">J</code> e <code class="text-amber-300">K</code>.</p>
-          </div>
+  <!-- NAVEGAÇÃO INFERIOR (CELULAR) -->
+  <nav id="mobileNav" class="no-print ui-bottom-nav" aria-label="Navegação">
+    <button type="button" class="ui-nav-item" data-view-target="alunos">
+      <i data-lucide="users" class="w-5 h-5 pointer-events-none"></i><span class="pointer-events-none">Alunos</span>
+    </button>
+    <button type="button" class="ui-nav-item" data-view-target="doc">
+      <i data-lucide="file-badge" class="w-5 h-5 pointer-events-none"></i><span class="pointer-events-none">Documento</span>
+    </button>
+    <button type="button" class="admin-only ui-nav-item" data-view-target="config">
+      <i data-lucide="sliders-horizontal" class="w-5 h-5 pointer-events-none"></i><span class="pointer-events-none">Ajustes</span>
+    </button>
+  </nav>
+
+  <!-- MODAL DE ENVIO INDIVIDUAL ASSISTIDO (SEM ANEXO) — UM ALUNO POR VEZ VIA OUTLOOK WEB -->
+  <div id="emailComposerModal" class="no-print ui-modal hidden">
+    <div class="ui-modal-panel ui-modal-lg flex flex-col">
+      <div class="ui-modal-head">
+        <div class="min-w-0">
+          <h3 class="ui-modal-title">Envio individual de e-mails</h3>
+          <p class="ui-help">Um aluno por vez: abra no Outlook Web, envie, volte aqui e avance. Destinatários das colunas C, J e K.</p>
         </div>
-        <button id="btnCloseEmailModal" type="button" class="text-slate-400 hover:text-white p-1 cursor-pointer ml-1">
+        <button id="btnCloseEmailModal" type="button" class="ui-icon-btn" aria-label="Fechar">
           <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
         </button>
       </div>
 
       <!-- Progresso -->
       <div class="shrink-0 space-y-1.5">
-        <div class="flex items-center justify-between text-xs">
-          <span class="text-slate-300">Aluno <b id="sendPosLabel" class="text-white">0 de 0</b> <span class="text-slate-500">(alunos filtrados)</span></span>
-          <span class="text-slate-300"><b id="sendSentCount" class="text-emerald-300">0</b> enviados • <b id="sendPendingCount" class="text-amber-300">0</b> pendentes</span>
+        <div class="flex flex-wrap items-center justify-between gap-x-3 text-xs text-slate-600">
+          <span>Aluno <b id="sendPosLabel" class="text-slate-900">0 de 0</b> <span class="text-slate-400">(filtrados)</span></span>
+          <span><b id="sendSentCount" class="text-emerald-700">0</b> enviados · <b id="sendPendingCount" class="text-amber-700">0</b> pendentes</span>
         </div>
-        <div class="w-full bg-slate-950 rounded-full h-2 border border-slate-800 overflow-hidden">
+        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
           <div id="sendProgressBar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 0%"></div>
         </div>
       </div>
 
-      <div class="space-y-3 text-xs overflow-y-auto flex-1 pr-1">
-        <div class="flex items-center justify-between gap-2 p-3 rounded-xl bg-slate-950 border border-slate-800">
+      <div class="space-y-3 text-sm overflow-y-auto flex-1 min-h-0 -mx-1 px-1">
+        <div class="ui-card flex items-center justify-between gap-2">
           <div class="min-w-0">
-            <div id="sendStudentName" class="text-sm font-bold text-white truncate"></div>
-            <div id="sendStudentSummary" class="text-[11px] text-slate-400"></div>
+            <div id="sendStudentName" class="text-sm font-bold text-slate-900 truncate"></div>
+            <div id="sendStudentSummary" class="text-xs text-slate-500"></div>
           </div>
-          <span id="sendStatusBadge" class="shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold"></span>
+          <span id="sendStatusBadge" class="shrink-0"></span>
         </div>
 
-        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+        <div id="sendNoEmailWarning" class="hidden ui-alert ui-alert-error">
+          Este aluno não tem e-mail nas colunas C, J ou K. Use <b>Pular</b>.
+        </div>
+
+        <div class="ui-field">
           <div class="flex items-center justify-between">
-            <label for="emailSubjectTemplate" class="font-semibold text-slate-300">Assunto padrão (vale para todos os alunos)</label>
-            <button id="btnResetSubjectTemplate" type="button" class="text-[11px] text-slate-400 hover:text-white underline cursor-pointer">Restaurar padrão</button>
+            <label class="ui-label" for="emailToField">Destinatários</label>
+            <button id="btnCopyEmailTo" type="button" class="ui-link">Copiar</button>
           </div>
-          <input id="emailSubjectTemplate" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs" />
-          <p class="text-[10px] text-slate-500">Use <code class="text-amber-300">{ALUNO}</code>, <code class="text-amber-300">{INSTITUICAO}</code> e <code class="text-amber-300">{ANO}</code> para preenchimento automático. O texto fica salvo neste navegador. Para ajustar só o aluno atual, edite o campo "Assunto" abaixo.</p>
+          <input id="emailToField" type="text" class="ui-input font-mono" />
         </div>
 
-        <div id="sendNoEmailWarning" class="hidden px-3 py-2 rounded-lg bg-red-950/60 border border-red-800 text-red-200">
-          ⚠️ Este aluno não tem e-mail nas colunas C, J ou K. Use <b>Pular</b>.
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="font-semibold text-slate-300">Destinatários</label>
-            <button id="btnCopyEmailTo" type="button" class="text-[11px] text-sky-400 hover:underline cursor-pointer">Copiar e-mails</button>
+        <div class="ui-field">
+          <div class="flex items-center justify-between">
+            <label class="ui-label" for="emailSubjectField">Assunto</label>
+            <button id="btnCopyEmailSubject" type="button" class="ui-link">Copiar</button>
           </div>
-          <input id="emailToField" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono text-xs" />
+          <input id="emailSubjectField" type="text" class="ui-input" />
         </div>
 
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="font-semibold text-slate-300">Assunto</label>
-            <button id="btnCopyEmailSubject" type="button" class="text-[11px] text-sky-400 hover:underline cursor-pointer">Copiar assunto</button>
+        <div class="ui-field">
+          <div class="flex items-center justify-between">
+            <label class="ui-label" for="emailBodyField">Mensagem (pode ajustar antes de abrir)</label>
+            <button id="btnCopyEmailBody" type="button" class="ui-link">Copiar</button>
           </div>
-          <input id="emailSubjectField" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white text-xs" />
+          <textarea id="emailBodyField" rows="8" class="ui-input ui-textarea"></textarea>
         </div>
 
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="font-semibold text-slate-300">Mensagem (pode ajustar antes de abrir)</label>
-            <button id="btnCopyEmailBody" type="button" class="text-[11px] text-sky-400 hover:underline cursor-pointer">Copiar mensagem</button>
+        <details class="ui-details">
+          <summary>Assunto padrão para todos os alunos</summary>
+          <div class="ui-field pt-2">
+            <div class="flex items-center justify-between">
+              <label class="ui-label" for="emailSubjectTemplate">Modelo do assunto</label>
+              <button id="btnResetSubjectTemplate" type="button" class="ui-link">Restaurar padrão</button>
+            </div>
+            <input id="emailSubjectTemplate" type="text" class="ui-input" />
+            <p class="ui-help">Use <code>{ALUNO}</code>, <code>{INSTITUICAO}</code> e <code>{ANO}</code> para preenchimento automático. Fica salvo neste navegador. Para mudar só o aluno atual, edite o campo "Assunto" acima.</p>
           </div>
-          <textarea id="emailBodyField" rows="10" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white text-xs leading-relaxed"></textarea>
-        </div>
+        </details>
 
-        <div id="emailCopyFeedback" class="hidden text-xs px-3 py-2 rounded-lg bg-emerald-950/70 border border-emerald-700 text-emerald-200"></div>
+        <div id="emailCopyFeedback" class="hidden ui-alert ui-alert-ok"></div>
       </div>
 
       <!-- Ações -->
-      <div class="shrink-0 space-y-2 pt-2 border-t border-slate-800">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="flex items-center gap-1.5">
-            <button id="btnSendPrev" type="button" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium cursor-pointer">← Anterior</button>
-            <button id="btnSendSkip" type="button" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium cursor-pointer">Pular →</button>
-          </div>
-          <div class="flex items-center gap-2">
-            <button id="btnLaunchOutlookWeb" type="button" class="px-4 py-2 rounded-lg bg-[#002855] hover:bg-[#003875] text-white border border-blue-800 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer shadow">
-              <i data-lucide="send" class="w-3.5 h-3.5 pointer-events-none"></i>
-              <span class="pointer-events-none">1. Abrir no Outlook Web</span>
-            </button>
-            <button id="btnSendMarkNext" type="button" class="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer shadow">
-              <i data-lucide="check" class="w-3.5 h-3.5 pointer-events-none"></i>
-              <span class="pointer-events-none">2. Enviado ✓ Próximo</span>
-            </button>
-          </div>
+      <div class="ui-modal-foot space-y-2">
+        <div class="ui-send-actions">
+          <button id="btnSendPrev" type="button" class="ui-btn">← Anterior</button>
+          <button id="btnSendSkip" type="button" class="ui-btn">Pular →</button>
+          <button id="btnLaunchOutlookWeb" type="button" class="ui-btn ui-btn-primary">
+            <i data-lucide="send" class="w-4 h-4 pointer-events-none"></i>
+            <span class="pointer-events-none">1. Abrir no Outlook</span>
+          </button>
+          <button id="btnSendMarkNext" type="button" class="ui-btn ui-btn-success">
+            <i data-lucide="check" class="w-4 h-4 pointer-events-none"></i>
+            <span class="pointer-events-none">2. Enviado, próximo</span>
+          </button>
         </div>
-        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-xs text-slate-500">
           <label class="flex items-center gap-1.5 cursor-pointer">
-            <input id="sendSkipSent" type="checkbox" checked class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0 cursor-pointer" />
+            <input id="sendSkipSent" type="checkbox" checked class="ui-check" />
             <span>Ao avançar, pular alunos já enviados</span>
           </label>
-          <div class="flex items-center gap-3">
-            <button id="btnSendUnmark" type="button" class="hover:text-white underline cursor-pointer">Desmarcar este aluno</button>
-            <button id="btnSendExportLog" type="button" class="hover:text-white underline cursor-pointer">Baixar relatório de envios (.csv)</button>
-            <button id="btnSendResetLog" type="button" class="hover:text-red-300 underline cursor-pointer">Zerar marcações</button>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <button id="btnSendUnmark" type="button" class="ui-link">Desmarcar este aluno</button>
+            <button id="btnSendExportLog" type="button" class="ui-link">Relatório de envios (.csv)</button>
+            <button id="btnSendResetLog" type="button" class="ui-link ui-link-danger">Zerar marcações</button>
           </div>
         </div>
-        <p class="text-[10px] text-slate-500">O Outlook Web abre sempre na <b>mesma aba</b>. As marcações de envio ficam guardadas neste navegador.</p>
+        <p class="text-[11px] text-slate-400">O Outlook Web abre sempre na mesma aba. As marcações de envio ficam guardadas neste navegador.</p>
       </div>
     </div>
   </div>
 
   <!-- MODAL DE PROGRESSO DE EXPORTAÇÃO PDF / .ZIP -->
-  <div id="zipProgressModal" class="no-print fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-center">
-      <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto">
+  <div id="zipProgressModal" class="no-print ui-modal ui-modal-center hidden">
+    <div class="ui-modal-panel ui-modal-sm text-center space-y-4">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 mx-auto">
         <i data-lucide="file-check-2" class="w-6 h-6 animate-pulse pointer-events-none"></i>
       </div>
       <div>
-        <h3 id="zipModalTitle" class="text-base font-bold text-white">Gerando Documentos em PDF</h3>
-        <p id="zipProgressText" class="text-xs text-slate-400 mt-1">Preparando documentos...</p>
+        <h3 id="zipModalTitle" class="ui-modal-title">Gerando documentos em PDF</h3>
+        <p id="zipProgressText" class="ui-help mt-1">Preparando documentos...</p>
       </div>
-      <div class="w-full bg-slate-950 rounded-full h-2.5 border border-slate-800 overflow-hidden">
+      <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
         <div id="zipProgressBar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 0%"></div>
       </div>
-      <div class="flex justify-center pt-1">
-        <button id="btnCancelZip" type="button" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-red-950 text-slate-300 hover:text-red-300 text-xs font-medium transition cursor-pointer">
-          Cancelar
-        </button>
+      <div class="flex justify-center">
+        <button id="btnCancelZip" type="button" class="ui-btn">Cancelar</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL DE CONEXÃO COM A PLANILHA (ONEDRIVE / EXCEL) -->
-  <div id="dataSourceModal" class="no-print fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-5">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
-            <i data-lucide="file-spreadsheet" class="w-5 h-5 pointer-events-none"></i>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-white">Conectar Planilha de Participação em Olimpíadas</h3>
-            <p class="text-xs text-slate-400">Leitura direta da aba <code class="text-sky-300">Geral</code> (a partir da linha 4)</p>
-          </div>
+  <!-- MODAL DA PLANILHA -->
+  <div id="dataSourceModal" class="no-print ui-modal hidden">
+    <div class="ui-modal-panel space-y-4">
+      <div class="ui-modal-head">
+        <div class="min-w-0">
+          <h3 class="ui-modal-title">Planilha de Participação em Olimpíadas</h3>
+          <p class="ui-help">Leitura da aba Geral (a partir da linha 4).</p>
         </div>
-        <button id="btnCloseDataSourceX" type="button" class="text-slate-400 hover:text-white p-1 cursor-pointer">
+        <button id="btnCloseDataSourceX" type="button" class="ui-icon-btn" aria-label="Fechar">
           <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
         </button>
       </div>
 
-      <div class="space-y-4">
-        <!-- Seleção da planilha (pasta do OneDrive sincronizada ou computador) -->
-        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Abrir da Pasta OneDrive ou Computador</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Selecione o arquivo <code class="text-slate-100">Participacao_em_Olimpiadas_2026-v21.xlsx</code> na sua pasta do OneDrive sincronizada ou no computador. O app <b>memoriza os últimos dados lidos</b> e abre com eles automaticamente; só é preciso selecionar de novo quando a planilha mudar.
-          </p>
-          <div class="flex flex-wrap gap-2 pt-1">
-            <button id="btnSelectExcelDirect" type="button" class="cursor-pointer px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center gap-2">
-              <i data-lucide="upload" class="w-4 h-4 pointer-events-none"></i>
-              <span class="pointer-events-none">Selecionar Planilha (.xlsx)</span>
-            </button>
-            <button id="btnConnectOneDriveHandle" type="button" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition flex items-center gap-1.5 cursor-pointer">
-              <i data-lucide="link-2" class="w-3.5 h-3.5 text-sky-400 pointer-events-none"></i>
-              <span class="pointer-events-none">Vincular com Atualização Rápida</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- v9: aviso sobre o vínculo permanente (File System Access API) -->
-        <div id="handleSupportNote" class="hidden p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-[11px] text-amber-200 leading-relaxed">
-          Este navegador (ex.: Brave) não permite o <b>vínculo permanente</b> com a planilha. Use <b>Selecionar Planilha</b>: o app memoriza os dados e o botão <b>Atualizar Dados</b> abre direto o seletor de arquivo.
-          Para atualizar com 1 clique, abra o Gerador no <b>Microsoft Edge</b> e use <b>Vincular com Atualização Rápida</b>.
-        </div>
-        <div id="savedDataInfo" class="hidden p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-300 leading-relaxed flex items-center justify-between gap-3">
-          <span id="savedDataInfoText"></span>
-          <button id="btnClearSavedData" type="button" class="shrink-0 text-[10px] px-2 py-1 rounded bg-slate-900 hover:bg-red-950 text-slate-400 hover:text-red-300 border border-slate-800 cursor-pointer">Esquecer dados salvos</button>
-        </div>
+      <p class="text-sm text-slate-600 leading-relaxed">
+        Selecione o arquivo <b class="text-slate-900">Participacao_em_Olimpiadas_2026-v21.xlsx</b> na pasta do OneDrive sincronizada ou no aparelho. O app <b>memoriza os últimos dados lidos</b> e abre com eles; só é preciso selecionar de novo quando a planilha mudar.
+      </p>
+      <div class="flex flex-wrap gap-2">
+        <button id="btnSelectExcelDirect" type="button" class="ui-btn ui-btn-primary">
+          <i data-lucide="upload" class="w-4 h-4 pointer-events-none"></i>
+          <span class="pointer-events-none">Selecionar planilha (.xlsx)</span>
+        </button>
+        <button id="btnConnectOneDriveHandle" type="button" class="ui-btn">
+          <i data-lucide="link-2" class="w-4 h-4 pointer-events-none"></i>
+          <span class="pointer-events-none">Vincular com atualização rápida</span>
+        </button>
       </div>
 
-      <div id="modalFeedbackMsg" class="hidden text-xs p-3 rounded-lg"></div>
+      <!-- Aviso sobre o vínculo permanente (File System Access API) -->
+      <div id="handleSupportNote" class="hidden ui-alert ui-alert-warn">
+        Este navegador (ex.: Brave ou celular) não permite o <b>vínculo permanente</b> com a planilha. Use <b>Selecionar planilha</b>: o app memoriza os dados e o botão <b>Atualizar</b> abre direto o seletor de arquivo.
+        Para atualizar com 1 clique, use o <b>Microsoft Edge</b> no computador e <b>Vincular com atualização rápida</b>.
+      </div>
+      <div id="savedDataInfo" class="hidden ui-card text-xs text-slate-600 leading-relaxed flex flex-wrap items-center justify-between gap-2">
+        <span id="savedDataInfoText"></span>
+        <button id="btnClearSavedData" type="button" class="ui-btn ui-btn-sm">Esquecer dados salvos</button>
+      </div>
 
-      <div class="flex items-center justify-between pt-2 border-t border-slate-800 text-xs text-slate-400">
-        <span>Colunas lidas: <b>C, D, F, H, I, J, K</b> (E-mails, Aluno, Olimpíada, Ano e Premiação)</span>
-        <button id="btnCloseDataSourceFooter" type="button" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-medium cursor-pointer">Fechar</button>
+      <div id="modalFeedbackMsg" class="hidden"></div>
+
+      <div class="ui-modal-foot flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+        <span>Colunas lidas: <b>C, D, F, H, I, J, K</b></span>
+        <button id="btnCloseDataSourceFooter" type="button" class="ui-btn">Fechar</button>
       </div>
     </div>
   </div>
 
-  <!-- v9: MODAL DE EXPORTAÇÃO DO PAINEL DE CONSULTA (SOMENTE LEITURA) -->
-  <div id="exportPanelModal" class="no-print fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
-            <i data-lucide="presentation" class="w-5 h-5 pointer-events-none"></i>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-white">Exportar Painel de Consulta</h3>
-            <p class="text-xs text-slate-400">Arquivo HTML somente leitura para professores e outros setores</p>
-          </div>
+  <!-- MODAL DE EXPORTAÇÃO DO PAINEL DE CONSULTA (SOMENTE LEITURA) -->
+  <div id="exportPanelModal" class="no-print ui-modal hidden">
+    <div class="ui-modal-panel space-y-4">
+      <div class="ui-modal-head">
+        <div class="min-w-0">
+          <h3 class="ui-modal-title">Exportar Painel de Consulta</h3>
+          <p class="ui-help">Arquivo HTML somente leitura para professores e outros setores.</p>
         </div>
-        <button id="btnCloseExportPanel" type="button" class="text-slate-400 hover:text-white p-1 cursor-pointer">
+        <button id="btnCloseExportPanel" type="button" class="ui-icon-btn" aria-label="Fechar">
           <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
         </button>
       </div>
-      <ul class="text-xs text-slate-300 space-y-1.5 leading-relaxed list-disc pl-4">
-        <li>Inclui os dados <b>atualmente carregados</b> (<span id="exportPanelCount">0</span> registros), o logotipo, os textos e as configurações visuais.</li>
+      <ul class="text-sm text-slate-600 space-y-1.5 leading-relaxed list-disc pl-5">
+        <li>Inclui os dados <b>atualmente carregados</b> (<span id="exportPanelCount">0</span> registros), os textos e as configurações visuais.</li>
         <li><b>Nenhum e-mail</b> (aluno ou responsáveis) é incluído no arquivo.</li>
         <li>Professores podem buscar alunos, filtrar e baixar Certificados e Históricos em PDF. Não há edição, carregamento de planilha nem envio de e-mails.</li>
-        <li>Salve o arquivo numa pasta do Teams/OneDrive com permissão <b>"Pode visualizar"</b>. Quando a planilha mudar, exporte novamente e substitua o arquivo.</li>
+        <li>Salve o arquivo numa pasta do Teams/OneDrive com permissão <b>"Pode visualizar"</b>. Quando a planilha mudar, exporte de novo e substitua o arquivo.</li>
       </ul>
-      <label class="flex items-start gap-2 p-3 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer">
-        <input id="exportIncludeSignatures" type="checkbox" class="mt-0.5 rounded bg-slate-900 border-slate-700 text-sky-500 focus:ring-0 cursor-pointer" />
-        <span class="text-xs text-slate-200">Incluir as <b>rubricas</b> (imagens das assinaturas)<br><span class="text-[11px] text-slate-400">Se desmarcado, os documentos do painel saem com o nome e o cargo, mas sem a rubrica.</span></span>
+      <label class="ui-card flex items-start gap-2.5 cursor-pointer">
+        <input id="exportIncludeSignatures" type="checkbox" class="ui-check mt-0.5" />
+        <span class="text-sm text-slate-700">Incluir as <b>rubricas</b> (imagens das assinaturas)<br><span class="text-xs text-slate-500">Se desmarcado, os documentos do painel saem com o nome e o cargo, mas sem a rubrica.</span></span>
       </label>
-      <div id="exportPanelWarning" class="hidden text-xs p-3 rounded-lg bg-amber-950/60 border border-amber-800 text-amber-200"></div>
-      <div class="flex justify-end gap-2 pt-1">
-        <button id="btnCancelExportPanel" type="button" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium cursor-pointer">Cancelar</button>
-        <button id="btnConfirmExportPanel" type="button" class="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold cursor-pointer flex items-center gap-1.5">
-          <i data-lucide="download" class="w-3.5 h-3.5 pointer-events-none"></i>
-          <span class="pointer-events-none">Baixar Painel (.html)</span>
+      <div id="exportPanelWarning" class="hidden ui-alert ui-alert-warn"></div>
+      <div class="ui-modal-foot flex justify-end gap-2">
+        <button id="btnCancelExportPanel" type="button" class="ui-btn">Cancelar</button>
+        <button id="btnConfirmExportPanel" type="button" class="ui-btn ui-btn-primary">
+          <i data-lucide="download" class="w-4 h-4 pointer-events-none"></i>
+          <span class="pointer-events-none">Baixar painel (.html)</span>
         </button>
       </div>
     </div>
@@ -959,25 +1202,23 @@
       if (emailCountEl) emailCountEl.textContent = groupedStudents.length;
 
       if (groupedStudents.length === 0) {
-        container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Nenhum aluno encontrado para este filtro.</div>`;
+        container.innerHTML = `<div class="ui-empty">${rawRecords.length === 0 ? (READONLY ? 'Este painel não contém dados.' : 'Nenhuma planilha carregada.') : 'Nenhum aluno encontrado para este filtro.'}</div>`;
         return;
       }
 
       container.innerHTML = groupedStudents.map((st, idx) => {
         const isSelected = !previewAllMode && idx === selectedStudentIndex;
         return `
-          <button type="button" data-student-idx="${idx}" class="student-item-btn w-full text-left px-3 py-2 flex items-center justify-between gap-2 transition cursor-pointer ${isSelected ? 'bg-[#A6192E]/20 border-l-4 border-[#A6192E] text-white' : 'hover:bg-slate-900 text-slate-300'}">
+          <button type="button" data-student-idx="${idx}" class="student-item-btn stu-item${isSelected ? ' is-active' : ''}">
             <div class="min-w-0 pointer-events-none">
-              <div class="text-xs font-semibold truncate">${escapeHtml(st.aluno)}</div>
-              <div class="text-[10px] text-slate-400 truncate">${st.counts.totalPremios} ${st.counts.totalPremios === 1 ? 'premiação' : 'premiações'}</div>
+              <div class="stu-name truncate">${escapeHtml(st.aluno)}</div>
+              <div class="stu-meta truncate">${st.counts.totalPremios} ${st.counts.totalPremios === 1 ? 'premiação' : 'premiações'}${!READONLY && isStudentSent(st) ? ' · <span class="stu-sent" title="E-mail marcado como enviado">e-mail enviado ✓</span>' : ''}</div>
             </div>
             <div class="flex items-center gap-1 shrink-0 pointer-events-none">
-              ${st.counts.ouro > 0 ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold badge-ouro">${st.counts.ouro}</span>` : ''}
-              ${st.counts.prata > 0 ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold badge-prata">${st.counts.prata}</span>` : ''}
-              ${st.counts.bronze > 0 ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold badge-bronze">${st.counts.bronze}</span>` : ''}
-              ${st.counts.mencao > 0 ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold badge-mencao">${st.counts.mencao}</span>` : ''}
-              <span class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">${st.counts.totalPremios}★</span>
-              ${!READONLY && isStudentSent(st) ? `<span class="text-[10px] font-bold text-emerald-400" title="E-mail marcado como enviado">✉✓</span>` : ''}
+              ${st.counts.ouro > 0 ? `<span class="stu-badge badge-ouro" title="Ouro">${st.counts.ouro}</span>` : ''}
+              ${st.counts.prata > 0 ? `<span class="stu-badge badge-prata" title="Prata">${st.counts.prata}</span>` : ''}
+              ${st.counts.bronze > 0 ? `<span class="stu-badge badge-bronze" title="Bronze">${st.counts.bronze}</span>` : ''}
+              ${st.counts.mencao > 0 ? `<span class="stu-badge badge-mencao" title="Menção Honrosa">${st.counts.mencao}</span>` : ''}
             </div>
           </button>
         `;
@@ -992,6 +1233,7 @@
       }
       renderStudentListSidebar();
       renderActivePreview();
+      if (isCompactLayout()) setUiView('doc');
     }
 
     function navigateStudent(delta) {
@@ -1034,19 +1276,13 @@
       const btnHist = document.getElementById('tabModeHist');
       const layoutBox = document.getElementById('certLayoutSelectorBox');
 
-      if (mode === 'certificado') {
-        btnCert.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-semibold transition bg-[#A6192E] text-white shadow cursor-pointer';
-        btnHist.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer';
-        layoutBox.classList.remove('hidden');
-      } else {
-        btnHist.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-semibold transition bg-[#002855] text-white shadow cursor-pointer';
-        btnCert.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white cursor-pointer';
-        layoutBox.classList.add('hidden');
-      }
+      btnCert.classList.toggle('is-active', mode === 'certificado');
+      btnHist.classList.toggle('is-active', mode !== 'certificado');
+      layoutBox.classList.toggle('hidden', mode !== 'certificado');
 
       updatePrintPageOrientation();
-      fitZoomToScreen();
       renderActivePreview();
+      fitZoomToScreen();
     }
 
     function setCertLayout(layout) {
@@ -1054,13 +1290,8 @@
       const btnGrid = document.getElementById('btnLayoutGrid');
       const btnGrouped = document.getElementById('btnLayoutGrouped');
 
-      if (layout === 'grid') {
-        btnGrid.className = 'py-1.5 px-2.5 rounded-lg text-[11px] font-medium border transition bg-slate-800 border-sky-500/60 text-sky-300 cursor-pointer';
-        btnGrouped.className = 'py-1.5 px-2.5 rounded-lg text-[11px] font-medium border transition bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 cursor-pointer';
-      } else {
-        btnGrouped.className = 'py-1.5 px-2.5 rounded-lg text-[11px] font-medium border transition bg-slate-800 border-sky-500/60 text-sky-300 cursor-pointer';
-        btnGrid.className = 'py-1.5 px-2.5 rounded-lg text-[11px] font-medium border transition bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 cursor-pointer';
-      }
+      btnGrid.classList.toggle('is-active', layout === 'grid');
+      btnGrouped.classList.toggle('is-active', layout !== 'grid');
       renderActivePreview();
     }
 
@@ -1551,13 +1782,12 @@
     // 10. RENDERIZAÇÃO CENTRAL E CONTROLE DE ZOOM
     // =========================================================================
     function getCustomConfig() {
-      const wmEnabledEl = document.getElementById('cfgWatermarkEnabled');
 
       return {
         schoolName: document.getElementById('cfgSchoolName').value || 'CENTRO DE TREINAMENTO OLÍMPICO',
         logoHeaderSize: 80, // fixo: selo CTO no topo
         logoFooterSize: 60, // fixo: logo do Mackenzie no rodapé
-        watermarkEnabled: wmEnabledEl ? wmEnabledEl.checked : true,
+        watermarkEnabled: true, // fixo: marca d'água sempre ligada
         watermarkOpacity: 5, // fixo: 5% de opacidade
         subtitle: document.getElementById('cfgSubtitle').value || '',
         locationDate: document.getElementById('cfgLocationDate').value || formatDefaultDate(),
@@ -1582,7 +1812,6 @@
         const saved = JSON.parse(localStorage.getItem('cto_cert_cfg_v4') || 'null');
         if (saved) {
           if (saved.schoolName) document.getElementById('cfgSchoolName').value = saved.schoolName;
-          if (typeof saved.watermarkEnabled === 'boolean') document.getElementById('cfgWatermarkEnabled').checked = saved.watermarkEnabled;
           if (saved.subtitle) document.getElementById('cfgSubtitle').value = saved.subtitle;
           if (saved.locationDate) document.getElementById('cfgLocationDate').value = saved.locationDate;
           if (saved.sig1Name) document.getElementById('cfgSig1Name').value = saved.sig1Name;
@@ -1598,7 +1827,6 @@
         localStorage.removeItem('cto_cert_cfg_v4');
       } catch (e) {}
       document.getElementById('cfgSchoolName').value = 'CENTRO DE TREINAMENTO OLÍMPICO';
-      document.getElementById('cfgWatermarkEnabled').checked = true;
       document.getElementById('cfgSubtitle').value = 'EXCELÊNCIA ACADÊMICA E OLÍMPIADAS DO CONHECIMENTO';
       document.getElementById('cfgLocationDate').value = formatDefaultDate();
       document.getElementById('cfgSig1Name').value = 'Coordenação do CTO';
@@ -1622,9 +1850,10 @@
         summaryLabel.textContent = 'Nenhum aluno disponível';
         pageIndicator.textContent = '0 páginas';
         container.innerHTML = `
-          <div class="p-12 rounded-2xl bg-slate-900 border border-slate-800 text-center max-w-md my-12">
-            <p class="text-sm font-semibold text-slate-300">${rawRecords.length === 0 ? 'Nenhuma planilha carregada.' : 'Nenhum registro encontrado para os filtros selecionados.'}</p>
-            <p class="text-xs text-slate-500 mt-1">${rawRecords.length === 0 ? (READONLY ? 'Este painel não contém dados.' : 'Clique em <b>Carregar Planilha (.xlsx)</b>, no topo, para começar.') : 'Altere o filtro de ano ou de olimpíada na barra lateral.'}</p>
+          <div class="ui-preview-empty">
+            <p class="text-base font-semibold text-slate-800">${rawRecords.length === 0 ? 'Nenhuma planilha carregada' : 'Nenhum registro para os filtros selecionados'}</p>
+            <p class="text-sm text-slate-500 mt-1.5">${rawRecords.length === 0 ? (READONLY ? 'Este painel não contém dados.' : 'Carregue a planilha de participação para começar.') : 'Altere o filtro de ano ou de olimpíada na lista de alunos.'}</p>
+            ${rawRecords.length === 0 && !READONLY ? '<button type="button" class="ui-btn ui-btn-primary mt-4" onclick="openDataSourceModal()">Carregar planilha (.xlsx)</button>' : ''}
           </div>
         `;
         return;
@@ -1664,26 +1893,36 @@
 
     function applyZoomTransform() {
       const container = document.getElementById('previewScaleContainer');
-      container.style.transformOrigin = 'top center';
+      const sizer = document.getElementById('previewSizer');
+      container.style.transformOrigin = 'top left';
       container.style.transform = `scale(${currentZoom})`;
+      // O "sizer" ocupa exatamente o tamanho já reduzido, evitando rolagem lateral (principalmente no celular)
+      if (sizer) {
+        sizer.style.width = `${Math.ceil(container.offsetWidth * currentZoom)}px`;
+        sizer.style.height = `${Math.ceil(container.offsetHeight * currentZoom)}px`;
+      }
       document.getElementById('zoomValueLabel').textContent = `${Math.round(currentZoom * 100)}%`;
     }
 
     function adjustZoom(delta) {
-      currentZoom = Math.min(1.25, Math.max(0.35, +(currentZoom + delta).toFixed(2)));
+      currentZoom = Math.min(1.25, Math.max(0.2, +(currentZoom + delta).toFixed(2)));
       applyZoomTransform();
     }
 
     function fitZoomToScreen() {
       const wrapper = document.getElementById('workspaceWrapper');
       if (!wrapper) return;
-      const availW = wrapper.clientWidth - 60;
-      const availH = wrapper.clientHeight - 60;
-      const pageW = currentDocMode === 'certificado' ? 1122 : 794;
-      const pageH = currentDocMode === 'certificado' ? 794 : 1122;
+      if (!wrapper.clientWidth) return; // pré-visualização oculta (celular, outra tela)
+      const pad = isCompactLayout() ? 24 : 56;
+      const availW = wrapper.clientWidth - pad;
+      const availH = wrapper.clientHeight - pad;
+      const pageW = currentDocMode === 'certificado' ? 1123 : 794;
+      const pageH = currentDocMode === 'certificado' ? 794 : 1123;
       const scaleW = availW / pageW;
       const scaleH = availH / pageH;
-      currentZoom = Math.min(1.0, Math.max(0.42, +(Math.min(scaleW, scaleH)).toFixed(2)));
+      // No celular, ajusta pela largura (rolagem vertical entre as páginas); no computador, página inteira visível
+      const target = isCompactLayout() ? scaleW : Math.min(scaleW, scaleH);
+      currentZoom = Math.min(1.0, Math.max(0.2, Math.floor(target * 100) / 100));
       applyZoomTransform();
     }
 
@@ -1803,10 +2042,10 @@
       const badge = document.getElementById('sendStatusBadge');
       const entry = log[sentKey(st)];
       if (entry) {
-        badge.className = 'shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-900/60 text-emerald-200 border border-emerald-700';
+        badge.className = 'shrink-0 ui-pill ui-pill-ok';
         badge.textContent = `✓ Enviado em ${formatStamp(new Date(entry.at))}`;
       } else {
-        badge.className = 'shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-900/50 text-amber-200 border border-amber-700';
+        badge.className = 'shrink-0 ui-pill ui-pill-wait';
         badge.textContent = 'Pendente';
       }
 
@@ -2232,7 +2471,7 @@
     function showModalMessage(msg, isError = false) {
       const box = document.getElementById('modalFeedbackMsg');
       box.classList.remove('hidden');
-      box.className = `text-xs p-3 rounded-lg border ${isError ? 'bg-red-950/60 border-red-800 text-red-200' : 'bg-emerald-950/60 border-emerald-800 text-emerald-200'}`;
+      box.className = `ui-alert ${isError ? 'ui-alert-error' : 'ui-alert-ok'}`;
       box.textContent = msg;
     }
 
@@ -2556,6 +2795,7 @@
     // ---- v9: aplica o modo somente leitura quando o arquivo é o Painel exportado ----
     function applyReadonlyMode() {
       document.querySelectorAll('.admin-only').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
+      document.body.classList.add('is-readonly');
       const sub = document.getElementById('appSubtitle');
       const when = READONLY.exportedAt ? formatStamp(new Date(READONLY.exportedAt)) : '';
       if (sub) sub.textContent = 'Painel de Consulta • Somente leitura';
@@ -2573,7 +2813,6 @@
       setVal('cfgSig2Role', c.sig2Role);
       setVal('cfgCustomText', c.customText);
       document.getElementById('cfgLocationDate').value = formatDefaultDate();
-      if (typeof c.watermarkEnabled === 'boolean') document.getElementById('cfgWatermarkEnabled').checked = c.watermarkEnabled;
       document.getElementById('cfgUseCustomText').checked = !!c.useCustomText;
       if (c.certLayoutMode) certLayoutMode = c.certLayoutMode;
 
@@ -2595,6 +2834,62 @@
     // =========================================================================
     // 15. VINCULAÇÃO EXPLÍCITA DE TODOS OS BOTÕES E EVENTOS (SEM FALHAS DE ESCOPO)
     // =========================================================================
+    // =========================================================================
+    // INTERFACE RESPONSIVA: telas do celular (Alunos / Documento / Ajustes) e menu
+    // =========================================================================
+    function isCompactLayout() {
+      return window.matchMedia('(max-width: 1023.98px)').matches;
+    }
+
+    function setUiView(view) {
+      if (view === 'config' && READONLY) view = 'alunos';
+      document.body.dataset.view = view;
+      document.querySelectorAll('[data-view-target]').forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.viewTarget === view || (!isCompactLayout() && view === 'doc' && btn.dataset.viewTarget === 'alunos'));
+      });
+      if (view === 'doc' || !isCompactLayout()) requestAnimationFrame(fitZoomToScreen);
+    }
+
+    function toggleMoreMenu(force) {
+      const menu = document.getElementById('moreMenu');
+      const btn = document.getElementById('btnMoreMenu');
+      const open = typeof force === 'boolean' ? force : menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', !open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function bindResponsiveUi() {
+      const mark = document.getElementById('appLogoMark');
+      if (mark && typeof BUILTIN_LOGO_CTO === 'string' && BUILTIN_LOGO_CTO) mark.src = BUILTIN_LOGO_CTO;
+
+      document.querySelectorAll('[data-view-target]').forEach(btn => {
+        btn.addEventListener('click', () => setUiView(btn.dataset.viewTarget));
+      });
+
+      document.getElementById('btnMoreMenu').addEventListener('click', (e) => { e.stopPropagation(); toggleMoreMenu(); });
+      document.getElementById('moreMenu').addEventListener('click', (e) => {
+        if (e.target.closest('.ui-menu-item')) toggleMoreMenu(false);
+      });
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#moreMenu') && !e.target.closest('#btnMoreMenu')) toggleMoreMenu(false);
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleMoreMenu(false); });
+
+      document.getElementById('syncStatusBadge').addEventListener('click', () => { if (!READONLY) openDataSourceModal(); });
+
+      let resizeTimer = null;
+      let wasCompact = isCompactLayout();
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const nowCompact = isCompactLayout();
+          if (nowCompact !== wasCompact) { wasCompact = nowCompact; setUiView(document.body.dataset.view || 'alunos'); }
+          fitZoomToScreen();
+        }, 150);
+      });
+      setUiView('alunos');
+    }
+
     function bindAllInteractiveControls() {
       // Topo
       document.getElementById('btnReloadOneDrive').addEventListener('click', reloadLinkedFile);
@@ -2638,9 +2933,6 @@
 
       ['cfgSchoolName', 'cfgSubtitle', 'cfgLocationDate', 'cfgSig1Name', 'cfgSig1Role', 'cfgSig2Name', 'cfgSig2Role', 'cfgCustomText'].forEach(id => {
         document.getElementById(id).addEventListener('input', saveAndRender);
-      });
-      ['cfgWatermarkEnabled'].forEach(id => {
-        document.getElementById(id).addEventListener('change', saveAndRender);
       });
       document.getElementById('cfgUseCustomText').addEventListener('change', toggleCustomTextMode);
 
@@ -2704,6 +2996,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       bindAllInteractiveControls();
+      bindResponsiveUi();
       if (READONLY) {
         applyReadonlyMode();
       } else {
