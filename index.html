@@ -377,14 +377,14 @@
           <span class="text-xs font-semibold text-slate-200 block">Logotipos (tamanho)</span>
           <div class="space-y-1.5">
             <div class="flex items-center gap-2">
-              <span class="text-[11px] text-slate-400 w-24 shrink-0">Colégio <span class="text-slate-500">(topo)</span></span>
-              <input id="cfgLogoSchoolSize" type="range" min="40" max="130" step="2" value="80" class="flex-1 accent-sky-500 h-1 bg-slate-800 rounded-lg cursor-pointer" />
-              <span id="cfgLogoSchoolSizeLabel" class="text-[10px] text-sky-400 font-mono w-10 text-right">80 px</span>
+              <span class="text-[11px] text-slate-400 w-24 shrink-0">Selo CTO <span class="text-slate-500">(topo)</span></span>
+              <input id="cfgLogoHeaderSize" type="range" min="40" max="130" step="2" value="80" class="flex-1 accent-sky-500 h-1 bg-slate-800 rounded-lg cursor-pointer" />
+              <span id="cfgLogoHeaderSizeLabel" class="text-[10px] text-sky-400 font-mono w-10 text-right">80 px</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-[11px] text-slate-400 w-24 shrink-0">Selo CTO <span class="text-slate-500">(rodapé)</span></span>
-              <input id="cfgLogoCtoSize" type="range" min="30" max="100" step="2" value="56" class="flex-1 accent-sky-500 h-1 bg-slate-800 rounded-lg cursor-pointer" />
-              <span id="cfgLogoCtoSizeLabel" class="text-[10px] text-sky-400 font-mono w-10 text-right">56 px</span>
+              <span class="text-[11px] text-slate-400 w-24 shrink-0">Colégio <span class="text-slate-500">(rodapé)</span></span>
+              <input id="cfgLogoFooterSize" type="range" min="30" max="100" step="2" value="48" class="flex-1 accent-sky-500 h-1 bg-slate-800 rounded-lg cursor-pointer" />
+              <span id="cfgLogoFooterSizeLabel" class="text-[10px] text-sky-400 font-mono w-10 text-right">48 px</span>
             </div>
           </div>
 
@@ -398,16 +398,9 @@
             <div class="flex items-center justify-between">
               <label class="flex items-center gap-1.5 text-[11px] text-slate-200 font-medium cursor-pointer">
                 <input id="cfgWatermarkEnabled" type="checkbox" checked class="rounded bg-slate-900 border-slate-700 text-sky-500 focus:ring-0 cursor-pointer" />
-                <span>Marca d'Água Institucional no Fundo</span>
+                <span>Marca d'Água (logo do Mackenzie) no Fundo</span>
               </label>
               <span id="watermarkOpacityLabel" class="text-[10px] text-sky-400 font-mono">5%</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] text-slate-500">Logo usado:</span>
-              <select id="cfgWatermarkSource" class="flex-1 bg-slate-900 border border-slate-800 rounded px-1.5 py-0.5 text-[11px] text-white cursor-pointer">
-                <option value="cto" selected>Logo do CTO</option>
-                <option value="school">Logo do Colégio</option>
-              </select>
             </div>
             <div class="flex items-center gap-2">
               <span class="text-[10px] text-slate-500">Opacidade:</span>
@@ -1114,37 +1107,38 @@
       `;
     }
 
-    // Alternativa C: logo do Colégio no cabeçalho; logo do CTO como selo entre as assinaturas.
-    // Com um só logo, ele vai para o cabeçalho e não há selo.
-    function getHeaderLogoSrc() { return uploadedImages.logoSchool || uploadedImages.logo || null; }
-    function getSealLogoSrc() { return (uploadedImages.logoSchool && uploadedImages.logo) ? uploadedImages.logo : null; }
+    // Selo redondo do CTO no cabeçalho; logo do Colégio (Mackenzie) entre as assinaturas e como marca d'água.
+    function getHeaderLogoSrc() { return uploadedImages.logo || uploadedImages.logoSchool || null; }
+    function getSealLogoSrc() { return (uploadedImages.logoSchool && uploadedImages.logo) ? uploadedImages.logoSchool : null; }
 
     function getHeaderLogoHtml(cfg) {
       const src = getHeaderLogoSrc();
       if (!src) return defaultTrophyLogoHtml(cfg);
-      const h = clampNum(cfg.logoSchoolSize, 40, 130, 80);
+      const h = clampNum(cfg.logoHeaderSize, 40, 130, 80);
       return `<img src="${src}" alt="Logo" class="object-contain shrink-0" style="height:${h}px;max-width:${Math.round(h * 3.6)}px;" />`;
     }
 
+    // Logo do Colégio no rodapé, centralizado entre as assinaturas
     function getSealHtml(cfg, compact) {
       const src = getSealLogoSrc();
       if (!src) return '';
-      const base = clampNum(cfg.logoCtoSize, 30, 100, 56);
+      const base = clampNum(cfg.logoFooterSize, 30, 100, 48);
       const h = Math.round(compact ? base * 0.85 : base);
-      return `<img src="${src}" alt="Selo" class="object-contain mx-auto" style="height:${h}px;max-width:${Math.round(h * 1.8)}px;" />`;
+      return `<img src="${src}" alt="Selo" class="object-contain mx-auto" style="height:${h}px;max-width:${Math.round(h * 4)}px;" />`;
     }
 
     function getWatermarkHtml(cfg, isPortrait = false) {
       if (!cfg.watermarkEnabled) return '';
       const opacityDecimal = (Number(cfg.watermarkOpacity || 5) / 100).toFixed(2);
       const sizeClass = isPortrait ? 'w-[125mm] h-[125mm]' : 'w-[135mm] h-[135mm]';
-      const preferSchool = cfg.watermarkSource === 'school';
-      const wmSrc = preferSchool ? (uploadedImages.logoSchool || uploadedImages.logo) : (uploadedImages.logo || uploadedImages.logoSchool);
+      // Marca d'água: logo do Mackenzie, ampliado (quase toda a largura útil da folha), com transparência
+      const wmSrc = uploadedImages.logoSchool || uploadedImages.logo;
+      const wmStyle = isPortrait ? 'width:180mm;height:150mm;' : 'width:250mm;height:150mm;';
 
       if (wmSrc) {
         return `
           <div class="watermark-layer" style="opacity: ${opacityDecimal};">
-            <img src="${wmSrc}" alt="" class="${sizeClass} object-contain" />
+            <img src="${wmSrc}" alt="" class="object-contain" style="${wmStyle}" />
           </div>
         `;
       }
@@ -1442,7 +1436,7 @@
     // Monta UMA página do Histórico (A4 retrato)
     function renderHistoryPageHtml(student, cfg, pageRows, pageIdx, totalPages, startRowNumber, isLastPage) {
       const histLeftLogo = getHeaderLogoSrc();
-      const histLogoH = Math.round(Math.min(clampNum(cfg.logoSchoolSize, 40, 130, 80) * 0.7, 72));
+      const histLogoH = Math.round(Math.min(clampNum(cfg.logoHeaderSize, 40, 130, 80) * 0.75, 72));
         return `
           <section class="a4-portrait font-carlito select-text flex flex-col justify-between p-[12mm]">
 
@@ -1452,7 +1446,7 @@
               <!-- FAIXA SUPERIOR INSTITUCIONAL (SEM TEXTO ANO: TODOS OS ANOS) -->
               <div class="bg-[#A6192E] text-white px-5 py-3.5 rounded-t-xl flex items-center justify-between shadow-sm">
                 <div class="flex items-center gap-3.5">
-                  ${histLeftLogo ? `<img src="${histLeftLogo}" class="object-contain bg-white/95 p-1.5 rounded-lg" style="height:${histLogoH}px;max-width:${Math.round(histLogoH * 3.6)}px;" />` : ''}
+                  ${histLeftLogo ? `<img src="${histLeftLogo}" class="object-contain" style="height:${histLogoH}px;max-width:${Math.round(histLogoH * 3.6)}px;" />` : ''}
                   <div>
                     <div class="text-base font-bold tracking-wider uppercase">${escapeHtml(cfg.schoolName)} • HISTÓRICO OLÍMPICO</div>
                     <div class="text-[11px] text-red-100">${escapeHtml(cfg.subtitle)}</div>
@@ -1579,17 +1573,16 @@
       const wmEnabledEl = document.getElementById('cfgWatermarkEnabled');
       const wmOpacityEl = document.getElementById('cfgWatermarkOpacity');
       const opacityVal = wmOpacityEl ? wmOpacityEl.value : '5';
-      ['cfgLogoSchoolSize', 'cfgLogoCtoSize'].forEach(id => { const el = document.getElementById(id), lb = document.getElementById(id + 'Label'); if (el && lb) lb.textContent = `${el.value} px`; });
+      ['cfgLogoHeaderSize', 'cfgLogoFooterSize'].forEach(id => { const el = document.getElementById(id), lb = document.getElementById(id + 'Label'); if (el && lb) lb.textContent = `${el.value} px`; });
       const labelEl = document.getElementById('watermarkOpacityLabel');
       if (labelEl) labelEl.textContent = `${opacityVal}%`;
 
       return {
         schoolName: document.getElementById('cfgSchoolName').value || 'CENTRO DE TREINAMENTO OLÍMPICO',
-        logoSchoolSize: Number(document.getElementById('cfgLogoSchoolSize').value) || 80,
-        logoCtoSize: Number(document.getElementById('cfgLogoCtoSize').value) || 56,
+        logoHeaderSize: Number(document.getElementById('cfgLogoHeaderSize').value) || 80,
+        logoFooterSize: Number(document.getElementById('cfgLogoFooterSize').value) || 48,
         watermarkEnabled: wmEnabledEl ? wmEnabledEl.checked : true,
         watermarkOpacity: opacityVal,
-        watermarkSource: (document.getElementById('cfgWatermarkSource') || {}).value || 'cto',
         subtitle: document.getElementById('cfgSubtitle').value || '',
         locationDate: document.getElementById('cfgLocationDate').value || formatDefaultDate(),
         sig1Name: document.getElementById('cfgSig1Name').value || '',
@@ -1613,12 +1606,10 @@
         const saved = JSON.parse(localStorage.getItem('cto_cert_cfg_v4') || 'null');
         if (saved) {
           if (saved.schoolName) document.getElementById('cfgSchoolName').value = saved.schoolName;
-          if (saved.logoSchoolSize) document.getElementById('cfgLogoSchoolSize').value = saved.logoSchoolSize;
-          else if (saved.logoSize) document.getElementById('cfgLogoSchoolSize').value = saved.logoSize === 'lg' ? 64 : 80;
-          if (saved.logoCtoSize) document.getElementById('cfgLogoCtoSize').value = saved.logoCtoSize;
+          if (saved.logoHeaderSize) document.getElementById('cfgLogoHeaderSize').value = saved.logoHeaderSize;
+          if (saved.logoFooterSize) document.getElementById('cfgLogoFooterSize').value = saved.logoFooterSize;
           if (typeof saved.watermarkEnabled === 'boolean') document.getElementById('cfgWatermarkEnabled').checked = saved.watermarkEnabled;
           if (saved.watermarkOpacity) document.getElementById('cfgWatermarkOpacity').value = saved.watermarkOpacity;
-          if (saved.watermarkSource) document.getElementById('cfgWatermarkSource').value = saved.watermarkSource;
           if (saved.subtitle) document.getElementById('cfgSubtitle').value = saved.subtitle;
           if (saved.locationDate) document.getElementById('cfgLocationDate').value = saved.locationDate;
           if (saved.sig1Name) document.getElementById('cfgSig1Name').value = saved.sig1Name;
@@ -1634,10 +1625,9 @@
         localStorage.removeItem('cto_cert_cfg_v4');
       } catch (e) {}
       document.getElementById('cfgSchoolName').value = 'CENTRO DE TREINAMENTO OLÍMPICO';
-      document.getElementById('cfgLogoSchoolSize').value = 80;
-      document.getElementById('cfgLogoCtoSize').value = 56;
+      document.getElementById('cfgLogoHeaderSize').value = 80;
+      document.getElementById('cfgLogoFooterSize').value = 48;
       document.getElementById('cfgWatermarkEnabled').checked = true;
-      document.getElementById('cfgWatermarkSource').value = 'cto';
       document.getElementById('cfgWatermarkOpacity').value = '5';
       document.getElementById('cfgSubtitle').value = 'EXCELÊNCIA ACADÊMICA E OLÍMPIADAS DO CONHECIMENTO';
       document.getElementById('cfgLocationDate').value = formatDefaultDate();
@@ -2550,8 +2540,8 @@
           email: '', email1: '', email2: ''
         })),
         cfg: {
-          schoolName: cfg.schoolName, logoSchoolSize: cfg.logoSchoolSize, logoCtoSize: cfg.logoCtoSize, watermarkEnabled: cfg.watermarkEnabled,
-          watermarkOpacity: cfg.watermarkOpacity, watermarkSource: cfg.watermarkSource, subtitle: cfg.subtitle,
+          schoolName: cfg.schoolName, logoHeaderSize: cfg.logoHeaderSize, logoFooterSize: cfg.logoFooterSize, watermarkEnabled: cfg.watermarkEnabled,
+          watermarkOpacity: cfg.watermarkOpacity, subtitle: cfg.subtitle,
           sig1Name: cfg.sig1Name, sig1Role: cfg.sig1Role, sig2Name: cfg.sig2Name, sig2Role: cfg.sig2Role,
           useCustomText: document.getElementById('cfgUseCustomText').checked,
           customText: document.getElementById('cfgCustomText').value || '',
@@ -2606,10 +2596,9 @@
       const c = READONLY.cfg || {};
       const setVal = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined && v !== null) el.value = v; };
       setVal('cfgSchoolName', c.schoolName);
-      setVal('cfgLogoSchoolSize', c.logoSchoolSize);
-      setVal('cfgLogoCtoSize', c.logoCtoSize);
+      setVal('cfgLogoHeaderSize', c.logoHeaderSize);
+      setVal('cfgLogoFooterSize', c.logoFooterSize);
       setVal('cfgWatermarkOpacity', c.watermarkOpacity);
-      setVal('cfgWatermarkSource', c.watermarkSource);
       setVal('cfgSubtitle', c.subtitle);
       setVal('cfgSig1Name', c.sig1Name);
       setVal('cfgSig1Role', c.sig1Role);
@@ -2683,8 +2672,8 @@
       ['cfgSchoolName', 'cfgSubtitle', 'cfgLocationDate', 'cfgSig1Name', 'cfgSig1Role', 'cfgSig2Name', 'cfgSig2Role', 'cfgCustomText', 'cfgWatermarkOpacity'].forEach(id => {
         document.getElementById(id).addEventListener('input', saveAndRender);
       });
-      ['cfgLogoSchoolSize', 'cfgLogoCtoSize'].forEach(id => document.getElementById(id).addEventListener('input', saveAndRender));
-      ['cfgWatermarkEnabled', 'cfgWatermarkSource'].forEach(id => {
+      ['cfgLogoHeaderSize', 'cfgLogoFooterSize'].forEach(id => document.getElementById(id).addEventListener('input', saveAndRender));
+      ['cfgWatermarkEnabled'].forEach(id => {
         document.getElementById(id).addEventListener('change', saveAndRender);
       });
       document.getElementById('cfgUseCustomText').addEventListener('change', toggleCustomTextMode);
