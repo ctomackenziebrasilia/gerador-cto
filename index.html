@@ -880,7 +880,7 @@
             <button id="btnSendResetLog" type="button" class="ui-link ui-link-danger">Zerar marcações</button>
           </div>
         </div>
-        <p class="text-[11px] text-slate-400">O Outlook Web abre sempre na mesma aba. As marcações de envio ficam guardadas neste navegador.</p>
+        <p class="text-[11px] text-slate-400">O Outlook Web abre sempre na mesma aba. As marcações de envio ficam neste navegador só como códigos, sem nomes nem e-mails.</p>
       </div>
     </div>
   </div>
@@ -918,7 +918,7 @@
       </div>
 
       <p class="text-sm text-slate-600 leading-relaxed">
-        Selecione o arquivo <b class="text-slate-900">Participacao_em_Olimpiadas_2026-v21.xlsx</b> na pasta do OneDrive sincronizada ou no aparelho. O app <b>memoriza os últimos dados lidos</b> e abre com eles; só é preciso selecionar de novo quando a planilha mudar.
+        Selecione o arquivo <b class="text-slate-900">Participacao_em_Olimpiadas_2026-v21.xlsx</b> na pasta do OneDrive sincronizada ou no aparelho. Por segurança, <b>nada da planilha fica gravado no navegador</b>: os dados ficam só nesta aba e são apagados ao fechá-la.
       </p>
       <div class="flex flex-wrap gap-2">
         <button id="btnSelectExcelDirect" type="button" class="ui-btn ui-btn-primary">
@@ -933,12 +933,12 @@
 
       <!-- Aviso sobre o vínculo permanente (File System Access API) -->
       <div id="handleSupportNote" class="hidden ui-alert ui-alert-warn">
-        Este navegador (ex.: Brave ou celular) não permite o <b>vínculo permanente</b> com a planilha. Use <b>Selecionar planilha</b>: o app memoriza os dados e o botão <b>Atualizar</b> abre direto o seletor de arquivo.
+        Este navegador (ex.: Brave ou celular) não permite o <b>vínculo permanente</b> com a planilha. Use <b>Selecionar planilha</b> a cada uso; o botão <b>Atualizar</b> abre direto o seletor de arquivo.
         Para atualizar com 1 clique, use o <b>Microsoft Edge</b> no computador e <b>Vincular com atualização rápida</b>.
       </div>
       <div id="savedDataInfo" class="hidden ui-card text-xs text-slate-600 leading-relaxed flex flex-wrap items-center justify-between gap-2">
         <span id="savedDataInfoText"></span>
-        <button id="btnClearSavedData" type="button" class="ui-btn ui-btn-sm">Esquecer dados salvos</button>
+        <button id="btnClearSavedData" type="button" class="ui-btn ui-btn-sm">Remover vínculo</button>
       </div>
 
       <div id="modalFeedbackMsg" class="hidden"></div>
@@ -995,7 +995,6 @@
     const PRISTINE_ROOT = document.documentElement.cloneNode(true);
     // Quando este arquivo é o Painel exportado, window.CTO_READONLY contém os dados (sem e-mails).
     const READONLY = (window.CTO_READONLY && typeof window.CTO_READONLY === 'object') ? window.CTO_READONLY : null;
-    const LAST_DATA_KEY = 'cto_last_data_v1';
     let noDataLoaded = true;
     let currentSourceLabel = 'Nenhuma planilha carregada';
 
@@ -1033,11 +1032,11 @@
     if (READONLY) {
       uploadedImages.sig1 = READONLY.images && READONLY.images.sig1 || null;
       uploadedImages.sig2 = READONLY.images && READONLY.images.sig2 || null;
-    } else {
-      try {
-        uploadedImages.sig1 = localStorage.getItem('cto_img_sig1') || null;
-        uploadedImages.sig2 = localStorage.getItem('cto_img_sig2') || null;
-      } catch (e) {}
+    }
+    // Dados sensíveis (nomes, e-mails e rubricas) ficam só na memória da aba e somem ao fechá-la.
+    // Remove o que versões anteriores tinham gravado no navegador.
+    if (!READONLY) {
+      try { ['cto_last_data_v1', 'cto_img_sig1', 'cto_img_sig2', 'cto_img_logo'].forEach(k => localStorage.removeItem(k)); } catch (e) {}
     }
 
     // =========================================================================
@@ -1948,7 +1947,7 @@
     // 11. ENVIO INDIVIDUAL ASSISTIDO DE E-MAILS (v9 — SEM ANEXO, UM ALUNO POR VEZ)
     //     O envio em massa foi removido; ver Documentação, seção 5.1 (Azure/Graph) para implementação futura.
     // =========================================================================
-    const SENT_LOG_KEY = 'cto_sent_log_v1';
+    const SENT_LOG_KEY = 'cto_sent_log_v2';
     const SUBJECT_TPL_KEY = 'cto_email_subject_tpl_v1';
     const DEFAULT_SUBJECT_TPL = 'Premiações Olímpicas — {ALUNO} ({INSTITUICAO})';
 
@@ -1973,14 +1972,53 @@
     }
     let sendQueueIndex = 0;
 
+    // Marcações de envio: só um código por aluno (hash com "sal" aleatório) e a data/hora.
+    // Nenhum nome, e-mail ou assunto fica gravado no navegador.
+    function hashCode53(str, seed) {
+      let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+      for (let i = 0; i < str.length; i++) {
+        const ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+      }
+      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+      return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+    }
+    function newSalt() {
+      const a = new Uint32Array(4);
+      (window.crypto || window.msCrypto).getRandomValues(a);
+      return Array.from(a, n => n.toString(36)).join('');
+    }
+    let sentLogCache = null;
     function readSentLog() {
-      try { return JSON.parse(localStorage.getItem(SENT_LOG_KEY) || '{}') || {}; } catch (e) { return {}; }
+      if (sentLogCache) return sentLogCache;
+      let log = null;
+      try { log = JSON.parse(localStorage.getItem(SENT_LOG_KEY) || 'null'); } catch (e) {}
+      if (!log || typeof log.salt !== 'string' || typeof log.marks !== 'object') log = { salt: newSalt(), marks: {} };
+      // Migração: converte as marcações antigas (com nome/e-mails) em códigos e apaga a versão antiga
+      try {
+        const old = JSON.parse(localStorage.getItem('cto_sent_log_v1') || 'null');
+        if (old && typeof old === 'object') {
+          Object.entries(old).forEach(([k, v]) => { log.marks[codeFor(k, log.salt)] = (v && v.at) || new Date().toISOString(); });
+          localStorage.removeItem('cto_sent_log_v1');
+          localStorage.setItem(SENT_LOG_KEY, JSON.stringify(log));
+        }
+      } catch (e) {}
+      sentLogCache = log;
+      return log;
     }
     function writeSentLog(log) {
+      sentLogCache = log;
       try { localStorage.setItem(SENT_LOG_KEY, JSON.stringify(log)); } catch (e) {}
     }
-    function sentKey(student) { return String(student.aluno || '').trim().toLowerCase(); }
-    function isStudentSent(student) { return !!readSentLog()[sentKey(student)]; }
+    function codeFor(nameKey, salt) {
+      const k = String(nameKey || '').trim().toLowerCase();
+      return hashCode53(salt + '|' + k, 7) + hashCode53(k + '|' + salt, 13);
+    }
+    function sentKey(student) { return codeFor(student.aluno, readSentLog().salt); }
+    function getSentAt(student) { return readSentLog().marks[sentKey(student)] || null; }
+    function isStudentSent(student) { return !!getSentAt(student); }
 
     function buildPersonalizedEmailData(student, cfg, yearFilter) {
       const recipients = [student.email, student.email1, student.email2]
@@ -2126,12 +2164,7 @@
       const st = groupedStudents[sendQueueIndex];
       if (!st) return;
       const log = readSentLog();
-      log[sentKey(st)] = {
-        aluno: st.aluno,
-        to: document.getElementById('emailToField').value.trim(),
-        subject: document.getElementById('emailSubjectField').value.trim(),
-        at: new Date().toISOString()
-      };
+      log.marks[sentKey(st)] = new Date().toISOString();
       writeSentLog(log);
       renderStudentListSidebar();
       goToNextStudent();
@@ -2141,7 +2174,7 @@
       const st = groupedStudents[sendQueueIndex];
       if (!st) return;
       const log = readSentLog();
-      delete log[sentKey(st)];
+      delete log.marks[sentKey(st)];
       writeSentLog(log);
       loadSendStudent(sendQueueIndex);
       renderStudentListSidebar();
@@ -2150,17 +2183,26 @@
 
     function resetSentLog() {
       if (!window.confirm('Zerar todas as marcações de "enviado" deste navegador? Use isso ao iniciar uma nova rodada de envios.')) return;
-      writeSentLog({});
+      writeSentLog({ salt: newSalt(), marks: {} });
       loadSendStudent(sendQueueIndex);
       renderStudentListSidebar();
       showToast('Marcações de envio zeradas.');
     }
 
     function exportSentLogCsv() {
-      const log = readSentLog();
-      const rows = Object.values(log).sort((a, b) => String(a.at).localeCompare(String(b.at)));
-      if (rows.length === 0) {
+      // O relatório é montado cruzando as marcações (códigos) com a planilha carregada agora
+      const totalMarks = Object.keys(readSentLog().marks).length;
+      if (totalMarks === 0) {
         showToast('Ainda não há envios marcados.', true);
+        return;
+      }
+      const rows = groupedStudents.filter(isStudentSent).map(st => ({
+        aluno: st.aluno,
+        to: Array.from(new Set([st.email, st.email1, st.email2].map(e => String(e || '').trim()).filter(Boolean))).join('; '),
+        at: getSentAt(st)
+      })).sort((a, b) => String(a.at).localeCompare(String(b.at)));
+      if (rows.length === 0) {
+        showToast('Os envios marcados não correspondem aos alunos filtrados. Carregue a planilha e ajuste os filtros.', true);
         return;
       }
       // Evita "injeção de fórmula" ao abrir o CSV no Excel: valores que começam com = + - @ viram texto
@@ -2169,8 +2211,8 @@
         if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
         return `"${t.replace(/"/g, '""')}"`;
       };
-      const lines = ['Aluno;Destinatarios;Assunto;Enviado em'];
-      rows.forEach(r => lines.push([esc(r.aluno), esc(r.to), esc(r.subject), esc(formatStamp(new Date(r.at)))].join(';')));
+      const lines = ['Aluno;Destinatarios (planilha atual);Enviado em'];
+      rows.forEach(r => lines.push([esc(r.aluno), esc(r.to), esc(formatStamp(new Date(r.at)))].join(';')));
       const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -2229,21 +2271,15 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
-        uploadedImages[key] = e.target.result;
-        try {
-          localStorage.setItem(`cto_img_${key}`, e.target.result);
-        } catch (err) {}
+        uploadedImages[key] = e.target.result; // só na memória: some ao fechar a aba
         renderActivePreview();
-        showToast('Imagem aplicada com sucesso!');
+        showToast('Rubrica aplicada (válida até fechar a aba).');
       };
       reader.readAsDataURL(file);
     }
 
     function clearUploadedImage(key) {
       uploadedImages[key] = null;
-      try {
-        localStorage.removeItem(`cto_img_${key}`);
-      } catch (e) {}
       renderActivePreview();
       showToast('Imagem removida.');
     }
@@ -2549,7 +2585,6 @@
         populateFilterDropdowns();
         applyFilters();
         updateSyncBadge(`${sourceLabel} (${extracted.length} registros)`, true);
-        saveLastLoadedData(extracted, sourceLabel);
         showModalMessage(`Sucesso! ${extracted.length} registros carregados da aba "${sheetName}".`);
         showToast(`${extracted.length} registros carregados com sucesso!`);
         setTimeout(() => closeDataSourceModal(), 800);
@@ -2565,46 +2600,23 @@
       return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
     }
 
-    function saveLastLoadedData(records, label) {
-      try {
-        localStorage.setItem(LAST_DATA_KEY, JSON.stringify({ records, label, savedAt: new Date().toISOString() }));
-      } catch (e) {}
-      refreshSavedDataInfo();
-    }
-
-    function readLastLoadedData() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(LAST_DATA_KEY) || 'null');
-        if (saved && Array.isArray(saved.records) && saved.records.length > 0) return saved;
-      } catch (e) {}
-      return null;
-    }
-
-    function restoreLastLoadedData() {
-      const saved = readLastLoadedData();
-      if (!saved) return false;
-      rawRecords = saved.records;
-      noDataLoaded = false;
-      currentSourceLabel = saved.label || 'Planilha';
-      const when = saved.savedAt ? formatStamp(new Date(saved.savedAt)) : '';
-      updateSyncBadge(`${currentSourceLabel} (${saved.records.length} registros) • lido em ${when}`, true);
-      return true;
-    }
-
-    function refreshSavedDataInfo() {
+    // Vínculo com a planilha (Edge/Chrome): mostra o aviso na janela da planilha e permite removê-lo.
+    // O vínculo guarda só a referência ao arquivo; os dados lidos ficam apenas na memória da aba.
+    async function refreshSavedDataInfo() {
       const box = document.getElementById('savedDataInfo');
       const txt = document.getElementById('savedDataInfoText');
       if (!box || !txt) return;
-      const saved = readLastLoadedData();
-      if (!saved) { box.classList.add('hidden'); return; }
-      const when = saved.savedAt ? formatStamp(new Date(saved.savedAt)) : '';
-      txt.innerHTML = `Dados memorizados: <b>${escapeHtml(saved.label || 'Planilha')}</b> — ${saved.records.length} registros, lidos em ${when}.`;
+      let handle = fileHandle;
+      if (!handle && supportsFileHandles) { try { handle = await idbGet('fileHandle'); } catch (e) {} }
+      if (!handle) { box.classList.add('hidden'); return; }
+      txt.innerHTML = `Planilha vinculada: <b>${escapeHtml(handle.name || 'planilha')}</b>. Use o botão Atualizar (↻) para ler.`;
       box.classList.remove('hidden');
+      if (noDataLoaded) updateSyncBadge('Planilha vinculada: clique em Atualizar (↻)', false);
     }
 
     // ---- v9: apaga TUDO o que o Gerador guardou neste navegador (computador compartilhado) ----
     async function wipeAllBrowserData() {
-      if (!window.confirm('Apagar deste navegador TODOS os dados do Gerador?\n\n• dados da planilha memorizados (nomes e e-mails)\n• rubricas (assinaturas)\n• configurações e textos\n• marcações de e-mails enviados\n• vínculo com a planilha\n\nEsta ação não pode ser desfeita.')) return;
+      if (!window.confirm('Apagar deste navegador TODOS os dados do Gerador?\n\n• planilha e rubricas abertas nesta aba\n• configurações e textos\n• marcações de e-mails enviados\n• vínculo com a planilha\n\nEsta ação não pode ser desfeita.')) return;
       try {
         const keys = [];
         for (let i = 0; i < localStorage.length; i++) {
@@ -2615,6 +2627,7 @@
       } catch (e) {}
       try { sessionStorage.clear(); } catch (e) {}
       fileHandle = null;
+      sentLogCache = null;
       try {
         await new Promise(res => {
           const req = indexedDB.deleteDatabase('cto_gerador');
@@ -2631,23 +2644,15 @@
       populateFilterDropdowns();
       applyFilters();
       updateSyncBadge('Nenhuma planilha carregada', false);
-      refreshSavedDataInfo();
+      document.getElementById('savedDataInfo').classList.add('hidden');
       showToast('Tudo apagado deste navegador. Lembre-se de apagar também os arquivos baixados (pasta Downloads).');
     }
 
     function clearSavedData() {
-      try { localStorage.removeItem(LAST_DATA_KEY); } catch (e) {}
       idbDel('fileHandle');
       fileHandle = null;
-      rawRecords = [...DEMO_RECORDS];
-      noDataLoaded = true;
-      currentSourceLabel = 'Nenhuma planilha carregada';
-      selectedStudentIndex = 0;
-      populateFilterDropdowns();
-      applyFilters();
-      updateSyncBadge('Nenhuma planilha carregada', false);
       refreshSavedDataInfo();
-      showToast('Dados memorizados e vínculo removidos deste navegador.');
+      showToast('Vínculo com a planilha removido deste navegador.');
     }
 
     // ---- v9: vínculo permanente com a planilha (Edge/Chrome) guardado no IndexedDB ----
@@ -2669,6 +2674,11 @@
     }
     async function idbGet(key) {
       try {
+        // Não cria o banco só para consultar (evita deixar rastro vazio no navegador)
+        if (indexedDB.databases) {
+          const dbs = await indexedDB.databases();
+          if (!dbs.some(d => d.name === 'cto_gerador')) return null;
+        }
         const db = await idbOpen();
         return await new Promise((res, rej) => { const tx = db.transaction('kv', 'readonly'); const r = tx.objectStore('kv').get(key); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
       } catch (e) { return null; }
@@ -2707,6 +2717,7 @@
         });
         fileHandle = handle;
         await idbSet('fileHandle', handle);
+        refreshSavedDataInfo();
         await readFromHandle(handle);
         showToast('Planilha vinculada! Nas próximas vezes, use o botão Atualizar (↻) no topo.');
       } catch (err) {
@@ -3024,7 +3035,6 @@
         applyReadonlyMode();
       } else {
         loadSavedConfig();
-        restoreLastLoadedData();
         refreshSavedDataInfo();
         if (!supportsFileHandles) {
           document.getElementById('handleSupportNote').classList.remove('hidden');
