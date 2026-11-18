@@ -18,7 +18,7 @@ O `index.html` traz uma política de segurança (CSP) que impede o app de fazer 
 Se uma mudança futura precisar de outro endereço (por exemplo, Microsoft Graph), ele deve ser acrescentado à CSP no início do `<head>`.
 
 ## Manutenção
-- Versão atual: **v10.1** (número no `<title>` do `index.html`).
+- Versão atual: **v11** (número no `<title>` do `index.html`).
 - Para publicar uma mudança: editar ou enviar o `index.html` na branch `main`; o GitHub Pages atualiza o site em cerca de 1 minuto (abrir com Ctrl+F5).
 - Para voltar a uma versão anterior: `index.html` → History → escolher a versão → copiar o conteúdo de volta.
 - Testes sempre com planilha **fictícia**. Regras completas e checklist de testes ficam na documentação interna do CTO (fora deste repositório).
