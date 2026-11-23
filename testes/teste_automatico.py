@@ -40,17 +40,24 @@ LINHAS = [
 ]
 
 
-def criar_planilha():
+def criar_planilha(trocar_colunas=False):
+    """trocar_colunas=True cria uma planilha com OLIMPÍADA e PREMIAÇÃO trocadas (para testar o aviso)."""
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = 'Geral'
     ws['A1'] = 'Planilha FICTÍCIA de teste'
-    for j, h in enumerate(CABECALHO, 1):
+    cab = list(CABECALHO)
+    if trocar_colunas:
+        cab[5], cab[8] = cab[8], cab[5]
+    for j, h in enumerate(cab, 1):
         ws.cell(row=3, column=j, value=h)
     for i, linha in enumerate(LINHAS):
+        linha = list(linha)
+        if trocar_colunas:
+            linha[5], linha[8] = linha[8], linha[5]
         for j, v in enumerate(linha, 1):
             ws.cell(row=4 + i, column=j, value=v)
-    caminho = SAIDA / 'planilha_ficticia.xlsx'
+    caminho = SAIDA / ('planilha_colunas_trocadas.xlsx' if trocar_colunas else 'planilha_ficticia.xlsx')
     wb.save(caminho)
     return str(caminho)
 
@@ -107,6 +114,17 @@ async def main():
             except Exception as e:
                 falhas.append(f'{nome}: não baixou ({e})')
 
+        pg = await nova_pagina(viewport={'width': 1400, 'height': 900})
+        await pg.wait_for_timeout(600)
+        checar(not await pg.is_visible('#dataSourceModal'),
+               'Planilha correta: a janela de aviso de cabeçalhos abriu sem motivo')
+        # Planilha com colunas trocadas: deve carregar, mas avisar.
+        await pg.set_input_files('#GlobalQuickFileInput', criar_planilha(trocar_colunas=True))
+        await pg.wait_for_timeout(1500)
+        aviso = await pg.inner_text('#modalFeedbackMsg') if await pg.is_visible('#modalFeedbackMsg') else ''
+        info['aviso_cabecalhos'] = aviso[:160]
+        checar('F3 deveria ser' in aviso and 'I3 deveria ser' in aviso,
+               'Colunas trocadas: não apareceu o aviso de cabeçalhos')
         pg = await nova_pagina(viewport={'width': 1400, 'height': 900})
         checar(not await pg.evaluate("!!document.querySelector('#studentList b')"),
                'HTML da planilha foi interpretado (falha no escapeHtml)')
