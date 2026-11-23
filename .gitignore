@@ -1,0 +1,36 @@
+# Este repositório é PÚBLICO. Nunca enviar dados de alunos.
+# Estas regras valem para o git (Claude, outras IAs, GitHub Desktop).
+# ATENÇÃO: o botão "Upload files" do site do GitHub NÃO respeita este arquivo;
+# ao enviar pelo site, confira que só vai o index.html.
+
+# Planilhas
+*.xlsx
+*.xlsm
+*.xls
+*.csv
+*.ods
+
+# Documentos e exportações do Gerador
+*.pdf
+*.zip
+Painel_Consulta_*.html
+Folha_Controle_*
+Certificado_*
+Historico_*
+
+# Rubricas e imagens avulsas (as imagens do app ficam embutidas no index.html)
+*.png
+*.jpg
+*.jpeg
+*.webp
+
+# Resultados dos testes automáticos
+testes/saida/
+
+# Sistema e editores
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+__pycache__/
+node_modules/
