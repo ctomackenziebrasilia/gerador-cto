@@ -191,6 +191,13 @@ async def main():
         corpo = await pg.input_value('#emailBodyField')
         checar('Matemática' in corpo and 'Física' not in corpo, 'E-mails: mensagem cita olimpíada não marcada')
         info['email_obmep'] = f'{pos} | rótulo: {await pg.inner_text("#emailOlympLabel")}'
+        # v11.7: o botão do Outlook usa o endereço novo (outlook.cloud.microsoft) com assunto e mensagem
+        await pg.evaluate("""() => { window.__abertos = []; window.open = function (u, n) { window.__abertos.push(String(u)); return {}; }; }""")
+        await pg.click('#btnLaunchOutlookWeb')
+        abertos = await pg.evaluate('window.__abertos.map(String)')
+        url_ok = bool(abertos) and abertos[0].startswith('https://outlook.cloud.microsoft/mail/deeplink/compose?to=') \
+            and '&subject=' in abertos[0] and '&body=' in abertos[0]
+        checar(url_ok, f'E-mails: link do Outlook inesperado ({abertos[:1]})')
         await pg.click('#btnSendMarkNext')
         await pg.wait_for_timeout(200)
         checar((await pg.inner_text('#sendSentCount')) == '1', 'E-mails: contador de enviados não subiu')
