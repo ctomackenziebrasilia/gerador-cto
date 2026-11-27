@@ -9,7 +9,7 @@ O teste cria uma planilha fictícia em testes/saida/ (nunca usar dados reais),
 abre o index.html local num navegador invisível, servindo as bibliotecas de vendor/,
 e confere: carregamento, PDFs (certificado, histórico, todos), folha de controle com
 3 mesas, Painel de Consulta sem e-mails/termo/turma, nada gravado no navegador,
-celular sem rolagem lateral, proteção contra HTML vindo da planilha e console sem erros.
+janela de e-mails com escolha de olimpíadas, celular sem rolagem lateral, proteção contra HTML vindo da planilha e console sem erros.
 Termina com "TUDO CERTO" ou com a lista de falhas.
 """
 import asyncio, json, os, re, sys
@@ -166,6 +166,41 @@ async def main():
         guardado = await pg.evaluate(
             "JSON.stringify([Object.entries(localStorage), Object.entries(sessionStorage)])")
         checar('Ana' not in guardado and 'exemplo' not in guardado, 'Dados de aluno gravados no navegador')
+
+        # v11.6: janela de e-mails com escolha de olimpíadas
+        pg = await nova_pagina(viewport={'width': 1400, 'height': 900})
+        await pg.click('#btnOpenEmailModal')
+        await pg.wait_for_timeout(500)
+        await pg.click('#emailOlympDetails summary')
+        n_olimp = await pg.locator('#emailOlympList input').count()
+        checar(n_olimp == 5, f'E-mails: lista deveria ter 5 olimpíadas com premiação (tem {n_olimp})')
+        pos = await pg.inner_text('#sendPosLabel')
+        checar(pos.endswith('de 8'), f'E-mails: fila inicial deveria ter 8 alunos premiados ({pos})')
+        await pg.click('#emailOlympSelNone')
+        await pg.wait_for_timeout(200)
+        checar((await pg.inner_text('#sendPosLabel')) == '0 de 0', 'E-mails: "Limpar" não esvaziou a fila')
+        checar(await pg.is_disabled('#btnLaunchOutlookWeb'), 'E-mails: botão do Outlook ativo com a fila vazia')
+        await pg.fill('#emailOlympSearch', 'publicas')
+        await pg.wait_for_timeout(200)
+        visiveis = await pg.evaluate("[...document.querySelectorAll('#emailOlympList label')].filter(l => l.style.display !== 'none').length")
+        checar(visiveis == 1, f'E-mails: pesquisa "publicas" deveria mostrar 1 olimpíada ({visiveis})')
+        await pg.click('#emailOlympSelAll')
+        await pg.wait_for_timeout(200)
+        pos = await pg.inner_text('#sendPosLabel')
+        checar(pos.endswith('de 3'), f'E-mails: só OBMEP deveria dar 3 alunos ({pos})')
+        corpo = await pg.input_value('#emailBodyField')
+        checar('Matemática' in corpo and 'Física' not in corpo, 'E-mails: mensagem cita olimpíada não marcada')
+        info['email_obmep'] = f'{pos} | rótulo: {await pg.inner_text("#emailOlympLabel")}'
+        await pg.click('#btnSendMarkNext')
+        await pg.wait_for_timeout(200)
+        checar((await pg.inner_text('#sendSentCount')) == '1', 'E-mails: contador de enviados não subiu')
+        await pg.click('#btnSendPrev')
+        await pg.wait_for_timeout(200)
+        checar('Enviado em' in await pg.inner_text('#sendStatusBadge'), 'E-mails: aluno enviado não mostra "Enviado em"')
+        guardado = await pg.evaluate("JSON.stringify(Object.entries(localStorage))")
+        checar('Ana' not in guardado and 'exemplo' not in guardado and 'Matem' not in guardado,
+               'E-mails: dados gravados no navegador')
+        await pg.screenshot(path=str(SAIDA / '4_emails.png'))
 
         cel = await nova_pagina(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
         checar(not await cel.evaluate('document.documentElement.scrollWidth > window.innerWidth'),
