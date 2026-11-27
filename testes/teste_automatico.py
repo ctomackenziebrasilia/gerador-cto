@@ -9,7 +9,7 @@ O teste cria uma planilha fictícia em testes/saida/ (nunca usar dados reais),
 abre o index.html local num navegador invisível, servindo as bibliotecas de vendor/,
 e confere: carregamento, PDFs (certificado, histórico, todos), folha de controle com
 3 mesas, Painel de Consulta sem e-mails/termo/turma, nada gravado no navegador,
-janela de e-mails com escolha de olimpíadas, celular sem rolagem lateral, proteção contra HTML vindo da planilha e console sem erros.
+janela de e-mails com escolha de olimpíadas, filtro de várias olimpíadas no painel, celular sem rolagem lateral, proteção contra HTML vindo da planilha e console sem erros.
 Termina com "TUDO CERTO" ou com a lista de falhas.
 """
 import asyncio, json, os, re, sys
@@ -208,6 +208,36 @@ async def main():
         checar('Ana' not in guardado and 'exemplo' not in guardado and 'Matem' not in guardado,
                'E-mails: dados gravados no navegador')
         await pg.screenshot(path=str(SAIDA / '4_emails.png'))
+
+        # v11.8: filtro de olimpíadas do painel lateral com várias escolhas
+        pg = await nova_pagina(viewport={'width': 1400, 'height': 900})
+        total_inicial = await pg.inner_text('#studentCounterBadge')
+        await pg.click('#filterOlympBtn')
+        await pg.wait_for_timeout(200)
+        checar(await pg.is_visible('#filterOlympPanel'), 'Filtro de olimpíadas: a lista não abriu')
+        await pg.fill('#filterOlympSearch', 'publicas')
+        await pg.wait_for_timeout(150)
+        await pg.click('#filterOlympAll')
+        await pg.fill('#filterOlympSearch', 'obf')
+        await pg.wait_for_timeout(150)
+        await pg.click('#filterOlympAll')
+        await pg.wait_for_timeout(300)
+        qualquer = await pg.inner_text('#studentCounterBadge')
+        checar(qualquer.startswith('5 '), f'Filtro "qualquer uma" (OBMEP, OBF) deveria dar 5 alunos ({qualquer})')
+        await pg.check('input[name="filterOlympMode"][value="all"]')
+        await pg.wait_for_timeout(300)
+        todas = await pg.inner_text('#studentCounterBadge')
+        checar(todas.startswith('1 '), f'Filtro "todas" (OBMEP + OBF) deveria dar 1 aluno ({todas})')
+        rotulo = await pg.inner_text('#filterOlympLabel')
+        checar(rotulo == 'OBF + OBMEP', f'Filtro: rótulo inesperado ({rotulo})')
+        info['filtro_olimpiadas'] = f'início {total_inicial} | qualquer uma: {qualquer} | todas: {todas} | rótulo: {rotulo}'
+        await pg.click('#filterOlympClose')
+        await pg.screenshot(path=str(SAIDA / '5_filtro_olimpiadas.png'))
+        await pg.click('#btnMoreMenu')
+        await pg.click('#btnOpenControlSheet')
+        await pg.wait_for_timeout(400)
+        marcadas = await pg.evaluate("document.querySelectorAll('#csOlympiadList input:checked').length")
+        checar(marcadas == 2, f'Folha de controle deveria abrir com as 2 olimpíadas do painel ({marcadas})')
 
         cel = await nova_pagina(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
         checar(not await cel.evaluate('document.documentElement.scrollWidth > window.innerWidth'),
